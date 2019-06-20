@@ -149,7 +149,7 @@ resources:
           - AttributeName: url
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: url
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -159,10 +159,10 @@ resources:
       Properties:
         TableName: Channels
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: url
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: url
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
