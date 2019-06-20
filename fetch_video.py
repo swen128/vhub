@@ -1,6 +1,7 @@
 import gzip
 import io
 import json
+import os
 import sys
 import urllib
 from typing import Tuple, Iterator, Union
@@ -73,7 +74,7 @@ def lambda_handler(event, context):
     htmls = [extract_html(obj) for obj in objs]
     new_videos = get_new_videos(*htmls)
     
-    youtube_api_key = raise NotImplementedError()
+    youtube_api_key = os.environ['GOOGLE_CLOUD_API_KEY']
     youtube = YouTube(youtube_api_key)
 
     video_details = map(youtube.get_video_detail, new_videos)
