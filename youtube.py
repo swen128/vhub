@@ -14,7 +14,7 @@ class YoutubeVideo:
                  category_id=None, default_language=None, localized=None):
         if is_valid_youtube_video_url(url):
             self.url = url
-            self.id = parse_qs(urlparse(url).query)['v']
+            self.id = parse_qs(urlparse(url).query)['v'][0]
             self.channel_id = channel_id
             self.title = title
             self.description = description
@@ -79,4 +79,4 @@ def is_valid_youtube_video_url(url: str) -> bool:
         and o.netloc == 'www.youtube.com' \
         and o.path == '/watch' \
         and 'v' in qs \
-        and re.fullmatch(r"[a-zA-Z0-9]+", qs['v']) is not None
+        and re.fullmatch(r"[a-zA-Z0-9]+", qs['v'][0]) is not None
