@@ -3,7 +3,7 @@ import io
 import json
 import sys
 import urllib
-from typing import Tuple, Iterator
+from typing import Tuple, Iterator, Union
 from youtube import YouTube, YoutubeVideo
 
 sys.path.append("lib")
@@ -11,10 +11,24 @@ sys.path.append("lib")
 from lib import boto3
 from lib.boto3_type_annotations import s3, dynamodb
 from lib.bs4 import BeautifulSoup
+from lib.toolz.dicttoolz import valmap
 
+
+def dict_to_dynamo_item(obj: Union[dict, list, str, int]) -> dict:
+    if isinstance(obj, dict):
+        return valmap(dict_to_dynamo_item, obj)
+    elif isinstance(obj, list):
+        xs = list(map(dict_to_dynamo_item, obj))
+        return {'L': xs}
+    elif isinstance(obj, str):
+        return {'S': obj}
+    elif isinstance(obj, int):
+        return {'I': obj}
+    
 
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
-    raise NotImplementedError()
+    item = dict_to_dynamo_item(vars(video))
+    table.put_item(Item=item)
 
 
 def get_latest_two_files(bucket: s3.Bucket, directory) -> Tuple[s3.Object, s3.Object]:
