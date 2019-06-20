@@ -21,7 +21,11 @@ def get_latest_two_files(bucket: s3.Bucket, directory) -> Tuple[s3.Object, s3.Ob
 
 
 def extract_html(obj: s3.Object) -> str:
-    raise NotImplementedError()
+    response = obj.get()
+    body = response['Body'].read()
+    with gzip.GzipFile(fileobj=io.BytesIO(body), mode='rb') as fh:
+        dic = json.load(fh)
+        return dic['body']
 
 
 def get_new_videos(prev_html: str, new_html: str) -> Iterator[YoutubeVideo]:
