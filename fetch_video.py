@@ -4,7 +4,7 @@ import json
 import os
 import sys
 import urllib
-from typing import Tuple, Iterator, Union
+from typing import Tuple, Iterator, Union, List
 from youtube import YouTube, YoutubeVideo
 
 sys.path.append("lib")
@@ -12,7 +12,7 @@ sys.path.append("lib")
 from lib import boto3
 from lib.boto3_type_annotations import s3, dynamodb
 from lib.bs4 import BeautifulSoup
-from lib.toolz.dicttoolz import valmap
+from lib.toolz.dicttoolz import valmap, assoc
 
 
 def dict_to_dynamo_item(obj: Union[dict, list, str, int]) -> dict:
@@ -28,7 +28,10 @@ def dict_to_dynamo_item(obj: Union[dict, list, str, int]) -> dict:
     
 
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
-    item = dict_to_dynamo_item(vars(video))
+    channels = mentioned_channel_urls(video)
+    dic = assoc(vars(video), "mentioned_channels", channels)
+    item = dict_to_dynamo_item(dic)
+    
     table.put_item(Item=item)
 
 
@@ -61,6 +64,14 @@ def parse_videos_list(html: str) -> Iterator[YoutubeVideo]:
 
 def get_new_videos(prev_html: str, new_html: str) -> Iterator[YoutubeVideo]:
     raise NotImplementedError()
+
+
+def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
+    if video.description is None:
+        return []
+    else:
+        channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9]+"
+        return re.findall(channel_url_regex, video.description)
 
 
 def lambda_handler(event, context):
