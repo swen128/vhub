@@ -22,6 +22,22 @@ service: vhub # NOTE: update this with your service name
 provider:
   name: aws
   runtime: python3.7
+  region: us-east-2
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - s3:GetObject
+    - Effect: "Allow"
+      Action:
+       - dynamodb:Query
+       - dynamodb:Scan
+       - dynamodb:GetItem
+       - dynamodb:PutItem
+       - dynamodb:UpdateItem
+       - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["ResponsesTable", "Arn"] }
+        - { "Fn::GetAtt": ["ChannelsTable", "Arn"] }
 
 # you can overwrite defaults here
 #  stage: dev
@@ -57,8 +73,16 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
+  fetch_video:
+    handler:
+      fetch_video.lambda_handler
+    events:
+      - s3: CrawledWebpagesStorage
+    environment:
+      GOOGLE_CLOUD_API_KEY: ${ssm:Google_Cloud_API_key~true}
+    events:
+      - sqs: 
+        arn: - { "Fn::GetAtt": ["SQS", "Arn"] }
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -111,3 +135,35 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+resources:
+  Resources:
+    CrawledWebpagesStorage:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: crawled-webpages
+    VideosTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: Videos
+        AttributeDefinitions:
+          - AttributeName: url
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    ChannelsTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: Channels
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
