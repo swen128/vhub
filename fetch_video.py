@@ -4,7 +4,7 @@ import json
 import os
 import sys
 import urllib
-from typing import Tuple, Iterator, Union, List
+from typing import Tuple, Iterator, Iterable, Union, List
 from youtube import YouTube, YoutubeVideo
 
 sys.path.append("lib")
@@ -62,8 +62,10 @@ def parse_videos_list(html: str) -> Iterator[YoutubeVideo]:
             )
 
 
-def get_new_videos(prev_html: str, new_html: str) -> Iterator[YoutubeVideo]:
-    raise NotImplementedError()
+def get_new_videos(prev_html: str, new_html: str) -> Iterable[YoutubeVideo]:
+    prev_videos = parse_videos_list(prev_html)
+    new_videos = parse_videos_list(new_html)
+    return set(new_videos) - set(prev_videos)
 
 
 def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
