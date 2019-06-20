@@ -46,7 +46,7 @@ def lambda_handler(event, context):
     youtube_api_key = raise NotImplementedError()
     youtube = YouTube(youtube_api_key)
 
-    video_details = map(youtube.get_video_detail, videos)
+    video_details = map(youtube.get_video_detail, new_videos)
 
     table = boto3.resource('dynamodb').Table('Videos')
 
