@@ -10,6 +10,7 @@ sys.path.append("lib")
 
 from lib import boto3
 from lib.boto3_type_annotations import s3, dynamodb
+from lib.bs4 import BeautifulSoup
 
 
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
@@ -26,6 +27,21 @@ def extract_html(obj: s3.Object) -> str:
     with gzip.GzipFile(fileobj=io.BytesIO(body), mode='rb') as fh:
         dic = json.load(fh)
         return dic['body']
+
+
+def parse_videos_list(html: str) -> Iterator[YoutubeVideo]:
+    try:
+        soup = BeautifulSoup(html, "lxml")
+    except:
+        soup = BeautifulSoup(html, "html5lib")
+
+    for table in soup.select("table"):
+        for video in table.select("tbody > tr"):
+            yield YoutubeVideo(
+                url = video['data-video-url'],
+                n_watch = int(video.select("i.fa-eye").text),
+                n_like = int(video.select("i.fa-thumbs-up"))
+            )
 
 
 def get_new_videos(prev_html: str, new_html: str) -> Iterator[YoutubeVideo]:
