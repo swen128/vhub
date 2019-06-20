@@ -4,7 +4,7 @@ import json
 import os
 import sys
 import urllib
-from typing import Tuple, Iterator, Iterable, Union, List
+from typing import Tuple, Iterable, Union, List
 from youtube import YouTube, YoutubeVideo
 
 sys.path.append("lib")
@@ -47,7 +47,7 @@ def extract_html(obj: s3.Object) -> str:
         return dic['body']
 
 
-def parse_videos_list(html: str) -> Iterator[YoutubeVideo]:
+def parse_videos_list(html: str) -> Iterable[YoutubeVideo]:
     try:
         soup = BeautifulSoup(html, "lxml")
     except:
