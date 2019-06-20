@@ -18,3 +18,8 @@ var/
 
 # Serverless directories
 .serverless
+
+# Misc
+/venv/
+/.vscode/
+/setup.cfg
