@@ -2,6 +2,7 @@ import gzip
 import io
 import json
 import os
+import re
 import sys
 import urllib
 from typing import Tuple, Iterable, Union, List
