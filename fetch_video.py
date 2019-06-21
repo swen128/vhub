@@ -95,4 +95,4 @@ def lambda_handler(event, context):
     table = boto3.resource('dynamodb').Table('Videos')
 
     for video in video_details:
-        save(table, video)
+        save_video(table, video)
