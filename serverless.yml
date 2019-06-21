@@ -27,6 +27,7 @@ provider:
     - Effect: "Allow"
       Action:
         - s3:GetObject
+        - s3:ListBucket	
     - Effect: "Allow"
       Action:
        - dynamodb:Query

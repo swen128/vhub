@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import urllib
+from datetime import datetime, timedelta
 from typing import Tuple, Iterable, Union, List
 from youtube import YouTube, YoutubeVideo
 
@@ -36,8 +37,17 @@ def save_video(table: dynamodb.Table, video: YoutubeVideo):
     table.put_item(Item=item)
 
 
-def get_latest_two_files(bucket: s3.Bucket, directory) -> Tuple[s3.Object, s3.Object]:
-    raise NotImplementedError()
+def get_latest_two_files(client: s3.Client, bucket: str, prefix: str) -> Tuple[s3.Object, s3.Object]:
+    an_hour_before = datetime.utcnow() - timedelta(hours=1)
+    timestamp = an_hour_before.replace(microsecond=0).isoformat().replace(':', '-')
+    
+    response = client.list_objects_v2(StartAfter=f"{prefix}/{timestamp}", MaxKeys=n)
+    keys = (content['Key'] for content in response['Contents'])
+
+    buck = client.Bucket(bucket)
+    prev, new = [buck.Object(key) for key in keys]
+
+    return (prev, new)
 
 
 def extract_html(obj: s3.Object) -> str:
@@ -78,13 +88,12 @@ def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
 
 
 def lambda_handler(event, context):
+    client = boto3.client('s3')
     bucket_name = event['Records'][0]['s3']['bucket']['name']
-    bucket = boto3.client('s3').Bucket(bucket_name)
+    bucket = client.Bucket(bucket_name)
 
-    key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
-    directory = raise NotImplementedError()
-
-    objs = get_latest_two_files(bucket, directory)
+    prefix = 'vtuber-ranking'
+    objs = get_latest_two_files(client, bucket, prefix)
     htmls = [extract_html(obj) for obj in objs]
     new_videos = get_new_videos(*htmls)
     
