@@ -6,7 +6,7 @@ import re
 import sys
 import urllib
 from datetime import datetime, timedelta
-from typing import Tuple, Iterable, Union, List
+from typing import Tuple, Iterable, Union, List, Optional
 from youtube import YouTube, YoutubeVideo
 
 sys.path.append("lib")
@@ -37,17 +37,22 @@ def save_video(table: dynamodb.Table, video: YoutubeVideo):
     table.put_item(Item=item)
 
 
-def get_latest_two_files(client: s3.Client, bucket: str, prefix: str) -> Tuple[s3.Object, s3.Object]:
-    an_hour_before = datetime.utcnow() - timedelta(hours=1)
-    timestamp = an_hour_before.replace(microsecond=0).isoformat().replace(':', '-')
-    
-    response = client.list_objects_v2(StartAfter=f"{prefix}/{timestamp}", MaxKeys=2)
-    keys = (content['Key'] for content in response['Contents'])
+def get_previous_object(obj: s3.Object) -> Optional[s3.Object]:
+    client = boto3.client('s3')
+    bucket = obj.bucket_name
+    key = obj.key
+    response = client.list_objects_v2(
+        Bucket=bucket,
+        StartAfter=key,
+        MaxKeys=1
+    )
+    contents = response['Contents']
 
-    buck = client.Bucket(bucket)
-    prev, new = [buck.Object(key) for key in keys]
-
-    return (prev, new)
+    if len(contents) == 0:
+        return None
+    else:
+        key_prev = contents[0]['Key']
+        return boto3.resource('s3').Object(bucket, key_prev)
 
 
 def extract_html(obj: s3.Object) -> str:
@@ -73,10 +78,14 @@ def parse_videos_list(html: str) -> Iterable[YoutubeVideo]:
             )
 
 
-def get_new_videos(prev_html: str, new_html: str) -> Iterable[YoutubeVideo]:
-    prev_videos = parse_videos_list(prev_html)
-    new_videos = parse_videos_list(new_html)
-    return set(new_videos) - set(prev_videos)
+def get_new_videos(new: s3.Object, prev: Optional[s3.Object]) -> Iterable[YoutubeVideo]:
+    new_videos = parse_videos_list(extract_html(new))
+
+    if prev is None:
+        return set(new_videos)
+    else:
+        prev_videos = parse_videos_list(extract_html(new))
+        return set(new_videos) - set(prev_videos)
 
 
 def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
@@ -88,13 +97,12 @@ def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
 
 
 def lambda_handler(event, context):
-    client = boto3.client('s3')
     bucket = event['Records'][0]['s3']['bucket']['name']
-
-    prefix = 'vtuber-ranking'
-    objs = get_latest_two_files(client, bucket, prefix)
-    htmls = [extract_html(obj) for obj in objs]
-    new_videos = get_new_videos(*htmls)
+    key = event['Records'][0]['s3']['object']['key']
+    
+    new_obj = boto3.resource('s3').Object(bucket, key)
+    prev_obj = get_previous_object(new_obj)
+    new_videos = get_new_videos(new_obj, prev_obj)
     
     youtube_api_key = os.environ['GOOGLE_CLOUD_API_KEY']
     youtube = YouTube(youtube_api_key)
