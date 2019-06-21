@@ -41,7 +41,7 @@ def get_latest_two_files(client: s3.Client, bucket: str, prefix: str) -> Tuple[s
     an_hour_before = datetime.utcnow() - timedelta(hours=1)
     timestamp = an_hour_before.replace(microsecond=0).isoformat().replace(':', '-')
     
-    response = client.list_objects_v2(StartAfter=f"{prefix}/{timestamp}", MaxKeys=n)
+    response = client.list_objects_v2(StartAfter=f"{prefix}/{timestamp}", MaxKeys=2)
     keys = (content['Key'] for content in response['Contents'])
 
     buck = client.Bucket(bucket)
@@ -89,8 +89,7 @@ def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
 
 def lambda_handler(event, context):
     client = boto3.client('s3')
-    bucket_name = event['Records'][0]['s3']['bucket']['name']
-    bucket = client.Bucket(bucket_name)
+    bucket = event['Records'][0]['s3']['bucket']['name']
 
     prefix = 'vtuber-ranking'
     objs = get_latest_two_files(client, bucket, prefix)
