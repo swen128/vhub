@@ -41,7 +41,7 @@ def get_latest_two_files(client: s3.Client, bucket: str, prefix: str) -> Tuple[s
     an_hour_before = datetime.utcnow() - timedelta(hours=1)
     timestamp = an_hour_before.replace(microsecond=0).isoformat().replace(':', '-')
     
-    response = client.list_objects_v2(StartAfter=f"{prefix}/{timestamp}", MaxKeys=n)
+    response = client.list_objects_v2(StartAfter=f"{prefix}/{timestamp}", MaxKeys=2)
     keys = (content['Key'] for content in response['Contents'])
 
     buck = client.Bucket(bucket)
