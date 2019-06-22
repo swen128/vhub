@@ -1,7 +1,7 @@
 import sys
 import unittest
 from moto import mock_dynamodb2
-from vhub.fetch_video import parse_videos_list, save_video, dict_to_dynamo_item
+from vhub.fetch_video import parse_videos_list, save_video
 from vhub.youtube import YoutubeVideo
 
 sys.path.append("lib")
@@ -28,20 +28,6 @@ class TestParseVideosList(unittest.TestCase):
 
         for video in videos:
             self.assertIsInstance(video, YoutubeVideo)
-
-
-class TestDictToDynamoItem(unittest.TestCase):
-    def test_small_dict(self):
-        dic = {"a": 1, "b": ["2", "3"]}
-        out = dict_to_dynamo_item(dic)
-        ground_truth = {"a": {"I": 1}, "b": {"L": [{"S": "2"}, {"S": "3"}]}}
-
-        self.assertDictEqual(out, ground_truth)
-
-    def test_invalid_dict(self):
-        dic = {"a": None}
-        with self.assertRaises(ValueError):
-            dict_to_dynamo_item(dic)
 
 
 class TestSaveVideo(unittest.TestCase):

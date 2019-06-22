@@ -17,26 +17,11 @@ from lib.boto3_type_annotations import s3, dynamodb
 from lib.toolz.dicttoolz import valmap, assoc
 
 
-def dict_to_dynamo_item(obj: Union[dict, list, str, int]) -> dict:
-    if isinstance(obj, dict):
-        return valmap(dict_to_dynamo_item, obj)
-    elif isinstance(obj, list):
-        xs = list(map(dict_to_dynamo_item, obj))
-        return {'L': xs}
-    elif isinstance(obj, str):
-        return {'S': obj}
-    elif isinstance(obj, int):
-        return {'I': obj}
-    else:
-        raise ValueError(f'The given object is neither `dict`, `list`, `str`, nor `int`:\n{obj}')
-    
-
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
     channels = mentioned_channel_urls(video)
     dic = assoc(vars(video), "mentioned_channels", channels)
-    item = dict_to_dynamo_item(dic)
     
-    table.put_item(Item=item)
+    table.put_item(Item=dic)
 
 
 def get_previous_object(obj: s3.Object) -> Optional[s3.Object]:
