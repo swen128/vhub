@@ -83,7 +83,8 @@ def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
         return []
     else:
         channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]+"
-        return re.findall(channel_url_regex, video.description)
+        urls = re.findall(channel_url_regex, video.description)
+        return list(set(urls) - {video.channel_url})
 
 
 def lambda_handler(event, context):
