@@ -61,8 +61,8 @@ class TestGetVideoById(unittest.TestCase):
         ])
         youtube = YouTube(secret=PLACE_HOLDER, http=http)
 
-        with self.assertRaises(ValueError):
-            youtube.get_video_by_id(id)
+        out = youtube.get_video_by_id(id)
+        self.assertIsNone(out)
 
 
 class TestGetVideoDetail(unittest.TestCase):
@@ -96,5 +96,6 @@ class TestGetVideoDetail(unittest.TestCase):
         ])
         youtube = YouTube(secret=PLACE_HOLDER, http=http)
 
-        with self.assertRaises(ValueError):
-            youtube.get_video_detail(video)
+        out = youtube.get_video_detail(video)
+        
+        self.assertIsNone(out)

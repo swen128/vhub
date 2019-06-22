@@ -1,5 +1,6 @@
 import re
 import sys
+from typing import Optional
 from urllib.parse import urlparse, parse_qs
 
 sys.path.append("lib")
@@ -40,35 +41,38 @@ class YouTube:
         req = self.youtube.videos().list(part="snippet", id=video_id)
         return req.execute()
 
-    def get_video_by_id(self, video_id: str) -> dict:
+    def get_video_by_id(self, video_id: str) -> Optional[dict]:
         res = self._get_video_by_id(video_id)
         items = res['items']
 
         if len(items) == 0:
-            raise ValueError(
-                f'YouTube video having the specified ID: {video_id} does not exist.')
+            return None
         else:
             return items[0]
 
-    def get_video_detail(self, video: YoutubeVideo) -> YoutubeVideo:
+    def get_video_detail(self, video: YoutubeVideo) -> Optional[YoutubeVideo]:
         res = self.get_video_by_id(video.id)
-        s = res["snippet"]
 
-        return YoutubeVideo(
-            url=video.url,
-            n_watch=video.n_watch,
-            n_like=video.n_like,
-            channel_id=s.get('channelId'),
-            title=s.get('title'),
-            description=s.get('description'),
-            published_at=s.get('publishedAt'),
-            tags=s.get('tags', []),
-            thumbnails=s.get('thumbnails'),
-            live_broadcast_content=s.get('liveBroadcastContent', 'none'),
-            category_id=s.get('categoryId'),
-            default_language=s.get('defaultLanguage'),
-            localized=s.get('localized')
-        )
+        if res is None:
+            return None
+        else:
+            s = res["snippet"]
+
+            return YoutubeVideo(
+                url=video.url,
+                n_watch=video.n_watch,
+                n_like=video.n_like,
+                channel_id=s.get('channelId'),
+                title=s.get('title'),
+                description=s.get('description'),
+                published_at=s.get('publishedAt'),
+                tags=s.get('tags', []),
+                thumbnails=s.get('thumbnails'),
+                live_broadcast_content=s.get('liveBroadcastContent', 'none'),
+                category_id=s.get('categoryId'),
+                default_language=s.get('defaultLanguage'),
+                localized=s.get('localized')
+            )
 
 
 def is_valid_youtube_video_url(url: str) -> bool:
