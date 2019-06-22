@@ -38,7 +38,7 @@ class TestSaveVideo(unittest.TestCase):
             url=url,
             n_watch=1,
             n_like=1,
-            channel_id="UCD-miitqNY3nyukJ4Fnf4_A",
+            channel_url="https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
             title="title",
             description="description",
             published_at="2018-02-16T04:40:17.000Z",

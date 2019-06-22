@@ -9,14 +9,14 @@ from lib.googleapiclient.discovery import build
 
 
 class YoutubeVideo:
-    def __init__(self, url: str, channel_id=None, title=None,
+    def __init__(self, url: str, channel_url=None, title=None,
                  description=None, published_at=None, tags=None, thumbnails=None,
                  live_broadcast_content=None, n_watch=None, n_like=None,
                  category_id=None, default_language=None, localized=None):
         if is_valid_youtube_video_url(url):
             self.url = url
             self.id = parse_qs(urlparse(url).query)['v'][0]
-            self.channel_id = channel_id
+            self.channel_url = channel_url
             self.title = title
             self.description = description
             self.published_at = published_at
@@ -57,12 +57,15 @@ class YouTube:
             return None
         else:
             s = res["snippet"]
+            base_url = "https://www.youtube.com/channel"
+            channel_id = s.get('channelId')
+            channel_url = f"{base_url}/{channel_id}" if 'channelId' in s else None
 
             return YoutubeVideo(
                 url=video.url,
                 n_watch=video.n_watch,
                 n_like=video.n_like,
-                channel_id=s.get('channelId'),
+                channel_url=channel_url,
                 title=s.get('title'),
                 description=s.get('description'),
                 published_at=s.get('publishedAt'),
