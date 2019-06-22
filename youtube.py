@@ -79,4 +79,4 @@ def is_valid_youtube_video_url(url: str) -> bool:
         and o.netloc == 'www.youtube.com' \
         and o.path == '/watch' \
         and 'v' in qs \
-        and re.fullmatch(r"[a-zA-Z0-9]+", qs['v'][0]) is not None
+        and re.fullmatch(r"[a-zA-Z0-9_\-]+", qs['v'][0]) is not None
