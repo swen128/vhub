@@ -102,4 +102,5 @@ def lambda_handler(event, context):
     table = boto3.resource('dynamodb').Table('Videos')
 
     for video in video_details:
-        save_video(table, video)
+        if video is not None:
+            save_video(table, video)
