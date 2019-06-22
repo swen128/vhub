@@ -1,7 +1,7 @@
 import sys
 import unittest
-from moto import mock_dynamodb2
-from vhub.fetch_video import parse_videos_list, save_video
+from moto import mock_dynamodb2, mock_s3
+from vhub.fetch_video import parse_videos_list, save_video, get_previous_object
 from vhub.youtube import YoutubeVideo
 
 sys.path.append("lib")
@@ -98,3 +98,16 @@ class TestSaveVideo(unittest.TestCase):
 
         self.assertEqual(out['url'], url)
         self.assertEqual(out['title'], "title")
+
+
+class TestGetPreviousObject(unittest.TestCase):
+    @mock_s3
+    def test_empty_bucket(self):
+        s3 = boto3.resource('s3', region_name='us-east-2')
+        s3.create_bucket(Bucket='crawled-webpages')
+        
+        obj = s3.Object('crawled-webpages', 'key')
+
+        out = get_previous_object(obj)
+
+        self.assertEqual(out, None)
