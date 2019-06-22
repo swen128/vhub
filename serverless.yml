@@ -81,7 +81,7 @@ provider:
 functions:
   fetch_video:
     handler:
-      fetch_video.lambda_handler
+      vhub.fetch_video.lambda_handler
     events:
       - s3: crawled-webpages
     environment:

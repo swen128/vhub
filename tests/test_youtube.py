@@ -1,8 +1,8 @@
 import json
 import sys
 import unittest
-from fetch_video import parse_videos_list
-from youtube import is_valid_youtube_video_url, YouTube, YoutubeVideo
+from vhub.fetch_video import parse_videos_list
+from vhub.youtube import is_valid_youtube_video_url, YouTube, YoutubeVideo
 
 sys.path.append('lib')
 

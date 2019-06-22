@@ -7,7 +7,7 @@ import sys
 import urllib
 from datetime import datetime, timedelta
 from typing import Tuple, Iterable, Union, List, Optional
-from youtube import YouTube, YoutubeVideo
+from .youtube import YouTube, YoutubeVideo
 
 sys.path.append("lib")
 

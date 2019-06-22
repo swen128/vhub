@@ -1,6 +1,6 @@
 import unittest
-from fetch_video import parse_videos_list
-from youtube import YoutubeVideo
+from vhub.fetch_video import parse_videos_list
+from vhub.youtube import YoutubeVideo
 
 
 def read_file(path: str) -> str:
