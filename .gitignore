@@ -15,6 +15,10 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+/bs4/
+/beautifulsoup4-*.dist-info/
+/soupsieve/
+/soupsieve-*.dist-info/
 
 # Serverless directories
 .serverless

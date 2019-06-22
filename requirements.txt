@@ -1,7 +1,6 @@
 boto3==1.9.169
 botocore==1.12.169
 boto3_type_annotations
-beautifulsoup4
 lxml
 html5lib
 toolz

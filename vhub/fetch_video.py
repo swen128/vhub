@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import urllib
+from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from typing import Tuple, Iterable, Union, List, Optional
 from .youtube import YouTube, YoutubeVideo
@@ -13,7 +14,6 @@ sys.path.append("lib")
 
 from lib import boto3
 from lib.boto3_type_annotations import s3, dynamodb
-from lib.bs4 import BeautifulSoup
 from lib.toolz.dicttoolz import valmap, assoc
 
 
