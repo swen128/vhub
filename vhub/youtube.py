@@ -58,16 +58,16 @@ class YouTube:
             url=video.url,
             n_watch=video.n_watch,
             n_like=video.n_like,
-            channel_id=s['channelId'],
-            title=s['title'],
-            description=s['description'],
-            published_at=s['publishedAt'],
-            tags=s['tags'],
-            thumbnails=s['thumbnails'],
-            live_broadcast_content=s['liveBroadcastContent'],
-            category_id=s['categoryId'],
-            default_language=s['defaultLanguage'],
-            localized=s['localized']
+            channel_id=s.get('channelId'),
+            title=s.get('title'),
+            description=s.get('description'),
+            published_at=s.get('publishedAt'),
+            tags=s.get('tags', []),
+            thumbnails=s.get('thumbnails'),
+            live_broadcast_content=s.get('liveBroadcastContent', 'none'),
+            category_id=s.get('categoryId'),
+            default_language=s.get('defaultLanguage'),
+            localized=s.get('localized')
         )
 
 
