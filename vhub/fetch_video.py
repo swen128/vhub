@@ -82,7 +82,7 @@ def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
     if video.description is None:
         return []
     else:
-        channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9]+"
+        channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]+"
         return re.findall(channel_url_regex, video.description)
 
 
