@@ -47,7 +47,41 @@ class TestDictToDynamoItem(unittest.TestCase):
 class TestSaveVideo(unittest.TestCase):
     @mock_dynamodb2
     def test_video(self):
-        video = YoutubeVideo("https://www.youtube.com/watch?v=-_xY7wNvw9k")
+        url = "https://www.youtube.com/watch?v=03H1qSot9_s"
+        video = YoutubeVideo(
+            url=url,
+            n_watch=1,
+            n_like=1,
+            channel_id="UCD-miitqNY3nyukJ4Fnf4_A",
+            title="title",
+            description="description",
+            published_at="2018-02-16T04:40:17.000Z",
+            tags=["UCD-miitqNY3nyukJ4Fnf4_A", "tag"],
+            thumbnails={
+                "default": {
+                    "url": "https://i.ytimg.com/vi/03H1qSot9_s/default.jpg",
+                    "width": 120,
+                    "height": 90
+                },
+                "medium": {
+                    "url": "https://i.ytimg.com/vi/03H1qSot9_s/mqdefault.jpg",
+                    "width": 320,
+                    "height": 180
+                },
+                "high": {
+                    "url": "https://i.ytimg.com/vi/03H1qSot9_s/hqdefault.jpg",
+                    "width": 480,
+                    "height": 360
+                }
+            },
+            live_broadcast_content="none",
+            category_id="20",
+            default_language="en",
+            localized={
+                "title": "title",
+                "description": "description"
+            }
+        )
 
         db = boto3.resource('dynamodb', region_name='us-east-2')
         db.create_table(
@@ -72,3 +106,9 @@ class TestSaveVideo(unittest.TestCase):
         table = db.Table('Videos')
 
         save_video(table, video)
+        
+        response = table.get_item(Key={"url": url})
+        out = response['Item']
+
+        self.assertEqual(out['url'], url)
+        self.assertEqual(out['title'], "title")
