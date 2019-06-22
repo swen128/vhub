@@ -71,10 +71,14 @@ def parse_videos_list(html: str) -> Iterable[YoutubeVideo]:
 
     for table in soup.select("table"):
         for video in table.select("tbody > tr"):
+            def f(selector: str) -> int:
+                elem = video.select_one(selector).next_sibling
+                return int(elem.string.strip().replace(',', ''))
+            
             yield YoutubeVideo(
                 url = video['data-video-url'],
-                n_watch = int(video.select("i.fa-eye").text),
-                n_like = int(video.select("i.fa-thumbs-up"))
+                n_watch = f('i.fa-eye'),
+                n_like = f('i.fa-thumbs-up')
             )
 
 
