@@ -15,10 +15,6 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-/bs4/
-/beautifulsoup4-*.dist-info/
-/soupsieve/
-/soupsieve-*.dist-info/
 
 # Serverless directories
 .serverless
@@ -28,3 +24,17 @@ var/
 /.vscode/
 /setup.cfg
 __pycache__/
+
+# dependencies
+/bs4/
+/beautifulsoup4-*.dist-info/
+/soupsieve/
+/soupsieve-*.dist-info/
+/html5lib/
+/html5lib-*.dist-info/
+/lxml/
+/lxml-*.dist-info/
+/webencodings/
+/webencodings-*.dist-info/
+/six.py
+/six-*.dist-info/
