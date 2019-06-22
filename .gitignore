@@ -1,3 +1,12 @@
+*
+!/vhub/
+!/tests/
+!/__init__.py
+!/.gitignore
+!/README.md
+!/requirements.txt
+!/serverless.yml
+
 # Distribution / packaging
 .Python
 env/
@@ -15,16 +24,6 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-/bs4/
-/beautifulsoup4-*.dist-info/
-/soupsieve/
-/soupsieve-*.dist-info/
-
-# Serverless directories
-.serverless
 
 # Misc
-/venv/
-/.vscode/
-/setup.cfg
 __pycache__/
