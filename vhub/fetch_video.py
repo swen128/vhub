@@ -33,12 +33,11 @@ def get_previous_object(obj: s3.Object) -> Optional[s3.Object]:
         StartAfter=key,
         MaxKeys=1
     )
-    contents = response['Contents']
 
-    if len(contents) == 0:
+    if response['KeyCount'] == 0:
         return None
     else:
-        key_prev = contents[0]['Key']
+        key_prev = response['Contents'][0]['Key']
         return boto3.resource('s3').Object(bucket, key_prev)
 
 
