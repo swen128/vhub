@@ -27,6 +27,8 @@ def dict_to_dynamo_item(obj: Union[dict, list, str, int]) -> dict:
         return {'S': obj}
     elif isinstance(obj, int):
         return {'I': obj}
+    else:
+        raise ValueError(f'The given object is neither `dict`, `list`, `str`, nor `int`:\n{obj}')
     
 
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
