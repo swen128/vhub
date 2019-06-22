@@ -4,7 +4,7 @@
 !/__init__.py
 !/.gitignore
 !/README.md
-!/requirements.txt
+!/requirements*.txt
 !/serverless.yml
 
 # Distribution / packaging
