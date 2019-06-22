@@ -2,7 +2,7 @@ import json
 import sys
 import unittest
 from fetch_video import parse_videos_list
-from youtube import is_valid_youtube_video_url, YouTube
+from youtube import is_valid_youtube_video_url, YouTube, YoutubeVideo
 
 sys.path.append('lib')
 
@@ -63,3 +63,38 @@ class TestGetVideoById(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             youtube.get_video_by_id(id)
+
+
+class TestGetVideoDetail(unittest.TestCase):
+    def test_found(self):
+        video = YoutubeVideo(
+            url="https://www.youtube.com/watch?v=03H1qSot9_s",
+            n_watch=128,
+            n_like=64
+        )
+        response = read_file("tests/api_responses/youtube/videos/list/no_mention.json")
+        http = HttpMockSequence([
+            ({"status": 200}, api_discovery),
+            ({"status": 200}, response)
+        ])
+        youtube = YouTube(secret=PLACE_HOLDER, http=http)
+
+        out = youtube.get_video_detail(video)
+
+        self.assertIsInstance(out, YoutubeVideo)
+        self.assertEqual(out.url, video.url)
+        self.assertEqual(out.n_watch, video.n_watch)
+        self.assertEqual(out.n_like, video.n_like)
+        self.assertEqual(out.published_at, "2018-02-16T04:40:17.000Z")
+
+    def test_not_found(self):
+        video = YoutubeVideo("https://www.youtube.com/watch?v=invalid_id")
+        response = read_file("tests/api_responses/youtube/videos/list/not_found.json")
+        http = HttpMockSequence([
+            ({"status": 200}, api_discovery),
+            ({"status": 200}, response)
+        ])
+        youtube = YouTube(secret=PLACE_HOLDER, http=http)
+
+        with self.assertRaises(ValueError):
+            youtube.get_video_detail(video)
