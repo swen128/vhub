@@ -1,0 +1,54 @@
+{
+    "kind": "youtube#videoListResponse",
+    "etag": "\"Bdx4f4ps3xCOOo1WZ91nTLkRZ_c/v1rvKsoMJJEn_g8uCUBqM8NXz3Y\"",
+    "pageInfo": {
+        "totalResults": 1,
+        "resultsPerPage": 1
+    },
+    "items": [
+        {
+            "kind": "youtube#video",
+            "etag": "\"Bdx4f4ps3xCOOo1WZ91nTLkRZ_c/1LRYz1WtiCXefL3frfleaBZ3Cjc\"",
+            "id": "03H1qSot9_s",
+            "snippet": {
+                "publishedAt": "2018-02-16T04:40:17.000Z",
+                "channelId": "UCD-miitqNY3nyukJ4Fnf4_A",
+                "title": "10分で分かる月ノ美兎【にじさんじ公式】",
+                "description": "にじさんじ公式バーチャルライバーの、月ノ美兎です！\nこちらは、今までの生配信のいいところを無理やりギュギュッとまとめた動画になります。\n\n苦渋の決断で削った部分が多々ありますので、興味を持ってくださった方は是非配信アーカイブをご視聴くださいね。",
+                "thumbnails": {
+                    "default": {
+                        "url": "https://i.ytimg.com/vi/03H1qSot9_s/default.jpg",
+                        "width": 120,
+                        "height": 90
+                    },
+                    "medium": {
+                        "url": "https://i.ytimg.com/vi/03H1qSot9_s/mqdefault.jpg",
+                        "width": 320,
+                        "height": 180
+                    },
+                    "high": {
+                        "url": "https://i.ytimg.com/vi/03H1qSot9_s/hqdefault.jpg",
+                        "width": 480,
+                        "height": 360
+                    }
+                },
+                "channelTitle": "月ノ美兎",
+                "tags": [
+                    "UCD-miitqNY3nyukJ4Fnf4_A",
+                    "にじさんじ",
+                    "バーチャルライバー",
+                    "にじさんじプロジェクト",
+                    "月ノ美兎",
+                    "バーチャルYoutuber"
+                ],
+                "categoryId": "20",
+                "liveBroadcastContent": "none",
+                "defaultLanguage": "ja",
+                "localized": {
+                    "title": "10分で分かる月ノ美兎【にじさんじ公式】",
+                    "description": "にじさんじ公式バーチャルライバーの、月ノ美兎です！\nこちらは、今までの生配信のいいところを無理やりギュギュッとまとめた動画になります。\n\n苦渋の決断で削った部分が多々ありますので、興味を持ってくださった方は是非配信アーカイブをご視聴くださいね。"
+                }
+            }
+        }
+    ]
+}

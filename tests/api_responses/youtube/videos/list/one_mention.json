@@ -1,0 +1,67 @@
+{
+    "kind": "youtube#videoListResponse",
+    "etag": "\"Bdx4f4ps3xCOOo1WZ91nTLkRZ_c/5vLfRepnfuoffJZqsSXolB-w7dk\"",
+    "pageInfo": {
+     "totalResults": 1,
+     "resultsPerPage": 1
+    },
+    "items": [
+     {
+      "kind": "youtube#video",
+      "etag": "\"Bdx4f4ps3xCOOo1WZ91nTLkRZ_c/iAmObyf8SjWiYRUUQRmADuD6cnE\"",
+      "id": "KNi82VggtBo",
+      "snippet": {
+       "publishedAt": "2019-06-10T11:58:47.000Z",
+       "channelId": "UCD-miitqNY3nyukJ4Fnf4_A",
+       "title": "【楓と美兎】ロキ【歌ってみた】",
+       "description": "ロキ と 楓と美兎 の共通点\n  →中盤からエンジンがかかり、そのまま死の話に突入する\n\n\n歌わせていただいた楽曲\n\n『ロキ』\nhttps://www.youtube.com/watch?v=Xg-qfsKN2_E\n\nmusic&words  : みきとP 様\nillust   :  brat 様(@brabrabrat00 )\nmix    : 𝙎𝙚𝙣𝙖𝙧𝙪 様(@_Senarhythm_)\nvocal  : 楓と美兎\n\n樋口楓さんのYouTubeチャンネル\nhttps://www.youtube.com/channel/UCsg-YqdqQ-KFF0LNk23BY4A\n\n樋口楓さんのTwitter\nhttps://twitter.com/Higuchikaede/\n\nわたくし(月ノ美兎)のTwitter\nhttps://twitter.com/MitoTsukino",
+       "thumbnails": {
+        "default": {
+         "url": "https://i.ytimg.com/vi/KNi82VggtBo/default.jpg",
+         "width": 120,
+         "height": 90
+        },
+        "medium": {
+         "url": "https://i.ytimg.com/vi/KNi82VggtBo/mqdefault.jpg",
+         "width": 320,
+         "height": 180
+        },
+        "high": {
+         "url": "https://i.ytimg.com/vi/KNi82VggtBo/hqdefault.jpg",
+         "width": 480,
+         "height": 360
+        },
+        "standard": {
+         "url": "https://i.ytimg.com/vi/KNi82VggtBo/sddefault.jpg",
+         "width": 640,
+         "height": 480
+        },
+        "maxres": {
+         "url": "https://i.ytimg.com/vi/KNi82VggtBo/maxresdefault.jpg",
+         "width": 1280,
+         "height": 720
+        }
+       },
+       "channelTitle": "月ノ美兎",
+       "tags": [
+        "にじさんじプロジェクト",
+        "バーチャルライバー",
+        "ロキ",
+        "月ノ美兎",
+        "樋口楓",
+        "にじさんじ",
+        "歌ってみた",
+        "みきとｐ"
+       ],
+       "categoryId": "24",
+       "liveBroadcastContent": "none",
+       "localized": {
+        "title": "【楓と美兎】ロキ【歌ってみた】",
+        "description": "ロキ と 楓と美兎 の共通点\n  →中盤からエンジンがかかり、そのまま死の話に突入する\n\n\n歌わせていただいた楽曲\n\n『ロキ』\nhttps://www.youtube.com/watch?v=Xg-qfsKN2_E\n\nmusic&words  : みきとP 様\nillust   :  brat 様(@brabrabrat00 )\nmix    : 𝙎𝙚𝙣𝙖𝙧𝙪 様(@_Senarhythm_)\nvocal  : 楓と美兎\n\n樋口楓さんのYouTubeチャンネル\nhttps://www.youtube.com/channel/UCsg-YqdqQ-KFF0LNk23BY4A\n\n樋口楓さんのTwitter\nhttps://twitter.com/Higuchikaede/\n\nわたくし(月ノ美兎)のTwitter\nhttps://twitter.com/MitoTsukino"
+       },
+       "defaultAudioLanguage": "ja"
+      }
+     }
+    ]
+   }
+   
