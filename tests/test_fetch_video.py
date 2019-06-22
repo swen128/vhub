@@ -111,3 +111,18 @@ class TestGetPreviousObject(unittest.TestCase):
         out = get_previous_object(obj)
 
         self.assertEqual(out, None)
+
+    @mock_s3
+    def test_found(self):
+        s3 = boto3.resource('s3', region_name='us-east-2')
+        bucket = s3.Bucket('crawled-webpages')
+        obj_1 = bucket.Object('1')
+        obj_2 = bucket.Object('2')
+
+        bucket.create()
+        obj_1.put()
+        obj_2.put()
+
+        out = get_previous_object(obj_1)
+
+        self.assertEqual(out.key, obj_2.key)
