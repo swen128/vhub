@@ -62,7 +62,10 @@ functions:
     handler:
       vhub.fetch_video.lambda_handler
     events:
-      - s3: crawled-webpages
+      - s3:
+        bucket: crawled-webpages
+        rules:
+          - prefix: vtuber_ranking/
     environment:
       GOOGLE_CLOUD_API_KEY: ${ssm:Google_Cloud_API_key~true}
     iamRoleStatements:
@@ -77,6 +80,26 @@ functions:
           - s3:ListBucket
         Resource:
           - arn:aws:s3:::crawled-webpages
+      - Effect: "Allow"
+        Action:
+          - s3:GetObject
+        Resource:
+          - arn:aws:s3:::crawled-webpages/*
+  fetch_channel:
+    handler:
+      vhub.fetch_channel.lambda_handler
+    events:
+      - s3:
+        bucket: crawled-webpages
+        rules: 
+          - prefix: vtuber_channel/
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        Resource:
+          - { "Fn::GetAtt": ["ChannelsTable", "Arn"] }
       - Effect: "Allow"
         Action:
           - s3:GetObject
