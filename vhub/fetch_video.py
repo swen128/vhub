@@ -2,7 +2,6 @@ import gzip
 import io
 import json
 import os
-import re
 import sys
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -17,10 +16,7 @@ from lib.toolz.dicttoolz import valmap, assoc
 
 
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
-    channels = mentioned_channel_urls(video)
-    dic = assoc(vars(video), "mentioned_channels", channels)
-    
-    table.put_item(Item=dic)
+    table.put_item(Item=vars(video))
 
 
 def get_previous_object(obj: s3.Object) -> Optional[s3.Object]:
@@ -75,15 +71,6 @@ def get_new_videos(new: s3.Object, prev: Optional[s3.Object]) -> Iterable[Youtub
     else:
         prev_videos = parse_videos_list(extract_html(new))
         return set(new_videos) - set(prev_videos)
-
-
-def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
-    if video.description is None:
-        return []
-    else:
-        channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]+"
-        urls = re.findall(channel_url_regex, video.description)
-        return list(set(urls) - {video.channel_url})
 
 
 def lambda_handler(event, context):

@@ -1,7 +1,7 @@
 import sys
 import unittest
 from moto import mock_dynamodb2, mock_s3
-from vhub.fetch_video import parse_videos_list, save_video, get_previous_object, mentioned_channel_urls
+from vhub.fetch_video import parse_videos_list, save_video, get_previous_object
 from vhub.youtube import YoutubeVideo
 
 sys.path.append("lib")
@@ -126,32 +126,3 @@ class TestGetPreviousObject(unittest.TestCase):
         out = get_previous_object(obj_1)
 
         self.assertEqual(out.key, obj_2.key)
-
-
-class TestMentionedChannelUrls(unittest.TestCase):
-    def test_self_mention(self):
-        url = "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A"
-        video = YoutubeVideo(
-            url="https://www.youtube.com/watch?v=03H1qSot9_s",
-            channel_url=url,
-            description=f"My channel: {url}"
-        )
-
-        out = mentioned_channel_urls(video)
-        
-        self.assertEqual(out, [])
-
-    def test_mentions(self):
-        url_1 = "https://www.youtube.com/channel/UC6oDys1BGgBsIC3WhG1BovQ"
-        url_2 = "https://www.youtube.com/channel/UCsg-YqdqQ-KFF0LNk23BY4A"
-        url_3 = "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A"
-
-        video = YoutubeVideo(
-            url="https://www.youtube.com/watch?v=vHl9Tx-HJHw",
-            channel_url=url_3,
-            description=f"{url_1} {url_2} {url_3}"
-        )
-
-        out = mentioned_channel_urls(video)
-        
-        self.assertSetEqual(set(out), {url_1, url_2})
