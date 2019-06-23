@@ -11,6 +11,7 @@ provider:
 package:
   exclude:
     - node_modules/**
+    - tests/**
 
 functions:
   fetch_video:
