@@ -94,12 +94,12 @@ functions:
       - stream:
         type: dynamodb
         arn:
-          Fn::ImportValue: VideosTable
+          { "Fn::GetAtt": ["VideosTable", "StreamArn"] }
     environment:
-      - TWITTER_CONSUMER_KEY: ${ssm:Twitter_Consumer_Key~true}
-      - TWITTER_CONSUMER_SECRET: ${ssm:Twitter_Consumer_Secret~true}
-      - TWITTER_ACCESS_TOKEN: ${ssm:Twitter_Access_Token~true}
-      - TWITTER_ACCESS_SECRET: ${ssm:Twitter_Access_Secret~true}
+      TWITTER_CONSUMER_KEY: ${ssm:Twitter_Consumer_Key~true}
+      TWITTER_CONSUMER_SECRET: ${ssm:Twitter_Consumer_Secret~true}
+      TWITTER_ACCESS_TOKEN: ${ssm:Twitter_Access_Token~true}
+      TWITTER_ACCESS_SECRET: ${ssm:Twitter_Access_Secret~true}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -167,6 +167,8 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
     ChannelsTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
