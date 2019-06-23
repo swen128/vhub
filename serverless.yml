@@ -23,28 +23,6 @@ provider:
   name: aws
   runtime: python3.7
   region: us-east-2
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-       - dynamodb:Query
-       - dynamodb:Scan
-       - dynamodb:GetItem
-       - dynamodb:PutItem
-       - dynamodb:UpdateItem
-       - dynamodb:DeleteItem
-      Resource:
-        - { "Fn::GetAtt": ["VideosTable", "Arn"] }
-        - { "Fn::GetAtt": ["ChannelsTable", "Arn"] }
-    - Effect: "Allow"
-      Action:
-        - s3:ListBucket
-      Resource:
-        - arn:aws:s3:::crawled-webpages
-    - Effect: "Allow"
-      Action:
-        - s3:GetObject
-      Resource:
-        - arn:aws:s3:::crawled-webpages/*
 
 # you can overwrite defaults here
 #  stage: dev
@@ -87,6 +65,23 @@ functions:
       - s3: crawled-webpages
     environment:
       GOOGLE_CLOUD_API_KEY: ${ssm:Google_Cloud_API_key~true}
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        Resource:
+          - { "Fn::GetAtt": ["VideosTable", "Arn"] }
+      - Effect: "Allow"
+        Action:
+          - s3:ListBucket
+        Resource:
+          - arn:aws:s3:::crawled-webpages
+      - Effect: "Allow"
+        Action:
+          - s3:GetObject
+        Resource:
+          - arn:aws:s3:::crawled-webpages/*
   notifier:
     handler:
       vhub.notifier.lambda_handler
@@ -100,6 +95,12 @@ functions:
       TWITTER_CONSUMER_SECRET: ${ssm:Twitter_Consumer_Secret~true}
       TWITTER_ACCESS_TOKEN: ${ssm:Twitter_Access_Token~true}
       TWITTER_ACCESS_SECRET: ${ssm:Twitter_Access_Secret~true}
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+        - dynamodb:GetItem
+        Resource:
+          - { "Fn::GetAtt": ["ChannelsTable", "Arn"] }
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
