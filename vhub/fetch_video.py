@@ -4,7 +4,6 @@ import json
 import os
 import re
 import sys
-import urllib
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from typing import Tuple, Iterable, Union, List, Optional
