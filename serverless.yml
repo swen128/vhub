@@ -34,6 +34,7 @@ provider:
        - dynamodb:DeleteItem
       Resource:
         - { "Fn::GetAtt": ["VideosTable", "Arn"] }
+        - { "Fn::GetAtt": ["ChannelsTable", "Arn"] }
     - Effect: "Allow"
       Action:
         - s3:ListBucket
@@ -86,6 +87,19 @@ functions:
       - s3: crawled-webpages
     environment:
       GOOGLE_CLOUD_API_KEY: ${ssm:Google_Cloud_API_key~true}
+  notifier:
+    handler:
+      vhub.notifier.lambda_handler
+    events:
+      - stream:
+        type: dynamodb
+        arn:
+          Fn::ImportValue: VideosTable
+    environment:
+      - TWITTER_CONSUMER_KEY: ${ssm:Twitter_Consumer_Key~true}
+      - TWITTER_CONSUMER_SECRET: ${ssm:Twitter_Consumer_Secret~true}
+      - TWITTER_ACCESS_TOKEN: ${ssm:Twitter_Access_Token~true}
+      - TWITTER_ACCESS_SECRET: ${ssm:Twitter_Access_Secret~true}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
