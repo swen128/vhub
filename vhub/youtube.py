@@ -15,7 +15,6 @@ class YoutubeVideo:
                  category_id=None, default_language=None, localized=None):
         if is_valid_youtube_video_url(url):
             self.url = url
-            self.id = parse_qs(urlparse(url).query)['v'][0]
             self.channel_url = channel_url
             self.title = title
             self.description = description
@@ -51,7 +50,8 @@ class YouTube:
             return items[0]
 
     def get_video_detail(self, video: YoutubeVideo) -> Optional[YoutubeVideo]:
-        res = self.get_video_by_id(video.id)
+        video_id = parse_qs(urlparse(video.url).query)['v'][0]
+        res = self.get_video_by_id(video_id)
 
         if res is None:
             return None
