@@ -24,6 +24,7 @@ var/
 /.vscode/
 /setup.cfg
 __pycache__/
+/node_modules/
 
 # dependencies
 /bs4/

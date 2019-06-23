@@ -1,9 +1,16 @@
 service: vhub
 
+plugins:
+  - serverless-iam-roles-per-function
+
 provider:
   name: aws
   runtime: python3.7
   region: us-east-2
+
+package:
+  exclude:
+    - node_modules/**
 
 functions:
   fetch_video:
