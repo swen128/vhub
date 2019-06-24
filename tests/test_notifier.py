@@ -3,7 +3,7 @@ import sys
 import unittest
 from moto import mock_dynamodb2, mock_s3
 from textwrap import dedent
-from vhub.notifier import dict_from_dynamo_item, mentioned_channel_urls, video_from_event, message
+from vhub.notifier import mentioned_channel_urls, video_from_event, message
 from vhub.youtube import YoutubeVideo
 
 sys.path.append("lib")
@@ -43,15 +43,6 @@ class TestMentionedChannelUrls(unittest.TestCase):
         out = mentioned_channel_urls(video)
         
         self.assertSetEqual(set(out), {url_1, url_2, url_3})
-
-
-class TestDictFromDynamoItem(unittest.TestCase):
-    def test_simple(self):
-        dic = {"a": {"I": 1}, "b": {"L": [{"S": "2"}, {"S": "3"}]}}
-        out = dict_from_dynamo_item(dic)
-        ground_truth = {"a": 1, "b": ["2", "3"]}
-
-        self.assertEqual(out, ground_truth)
 
 
 class TestVideoFromEvent(unittest.TestCase):

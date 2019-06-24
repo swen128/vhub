@@ -7,6 +7,7 @@ from .youtube import YoutubeVideo
 sys.path.append("lib")
 
 from lib import boto3
+from lib.boto3.dynamodb.types import TypeDeserializer
 from lib.boto3_type_annotations import dynamodb
 from lib import tweepy
 from lib.toolz import valmap
@@ -35,20 +36,9 @@ def mentioned_vtuber_channels(video: YoutubeVideo, table: dynamodb.Table) -> Ite
     return vtuber_channels
 
 
-def dict_from_dynamo_item(item: dict):
-    if 'L' in item:
-        return [dict_from_dynamo_item(x) for x in item['L']]
-    else:
-        return \
-            item.get('N') or \
-            item.get('S') or \
-            item.get('I') or \
-            valmap(dict_from_dynamo_item, item)
-
-
 def video_from_event(event) -> YoutubeVideo:
     image = event['Records'][0]['dynamodb']['NewImage']
-    dic = dict_from_dynamo_item(image)
+    dic = valmap(TypeDeserializer().deserialize, image)
     
     return YoutubeVideo(**dic)
 
