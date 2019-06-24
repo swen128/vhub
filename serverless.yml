@@ -15,49 +15,50 @@ package:
 
 functions:
   fetch_video:
-    handler:
-      vhub.fetch_video.lambda_handler
+    handler: vhub.fetch_video.lambda_handler
     events:
       - s3: crawled-webpages
     environment:
       GOOGLE_CLOUD_API_KEY: ${ssm:Google_Cloud_API_key~true}
     iamRoleStatements:
-      - Effect: "Allow"
+      - Effect: Allow
         Action:
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
         Resource:
-          - { "Fn::GetAtt": ["VideosTable", "Arn"] }
-      - Effect: "Allow"
+          - Fn::GetAtt:
+            - VideosTable
+            - Arn
+      - Effect: Allow
         Action:
           - s3:ListBucket
         Resource:
           - arn:aws:s3:::crawled-webpages
-      - Effect: "Allow"
+      - Effect: Allow
         Action:
           - s3:GetObject
         Resource:
           - arn:aws:s3:::crawled-webpages/*
   fetch_channel:
-    handler:
-      vhub.fetch_channel.lambda_handler
+    handler: vhub.fetch_channel.lambda_handler
     events:
       - s3: crawled-channels
     iamRoleStatements:
-      - Effect: "Allow"
+      - Effect: Allow
         Action:
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
         Resource:
-          - { "Fn::GetAtt": ["ChannelsTable", "Arn"] }
-      - Effect: "Allow"
+          Fn::GetAtt:
+            - ChannelsTable
+            - Arn
+      - Effect: Allow
         Action:
           - s3:GetObject
         Resource:
           - arn:aws:s3:::crawled-channels/*
   notifier:
-    handler:
-      vhub.notifier.lambda_handler
+    handler: vhub.notifier.lambda_handler
     events:
       - stream:
           type: dynamodb
@@ -72,11 +73,13 @@ functions:
       TWITTER_ACCESS_TOKEN: ${ssm:Twitter_Access_Token~true}
       TWITTER_ACCESS_SECRET: ${ssm:Twitter_Access_Secret~true}
     iamRoleStatements:
-      - Effect: "Allow"
+      - Effect: Allow
         Action:
-        - dynamodb:GetItem
+          - dynamodb:GetItem
         Resource:
-          - { "Fn::GetAtt": ["ChannelsTable", "Arn"] }
+          - Fn::GetAtt:
+            - ChannelsTable
+            - Arn
 
 resources:
   Resources:
