@@ -14,7 +14,7 @@ from lib.toolz import valmap
 
 
 def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[dict]:
-    response = table.get_obj(Key={'url': url})
+    response = table.get_item(Key={'url': url})
 
     return response.get('Item')
 
