@@ -78,6 +78,22 @@ class YouTube:
             )
 
 
+class YoutubeChannel:
+    def __init__(self, url, name=None, n_subscriber=None):
+        if is_valid_youtube_channel_url(url):
+            self.url = url
+            self.name = name
+            self.n_subscriber = n_subscriber
+        else:
+            raise ValueError(f"{url} is not a valid YouTube channel URL.")
+
+
+def is_valid_youtube_channel_url(url: str) -> bool:
+    channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]{20,}"
+    match = re.fullmatch(channel_url_regex, url)
+    return match is not None
+
+
 def is_valid_youtube_video_url(url: str) -> bool:
     o = urlparse(url)
     qs = parse_qs(o.query)
