@@ -60,9 +60,12 @@ functions:
       vhub.notifier.lambda_handler
     events:
       - stream:
-        type: dynamodb
-        arn:
-          { "Fn::GetAtt": ["VideosTable", "StreamArn"] }
+          type: dynamodb
+          batchSize: 1
+          arn:
+            Fn::GetAtt:
+              - VideosTable
+              - StreamArn
     environment:
       TWITTER_CONSUMER_KEY: ${ssm:Twitter_Consumer_Key~true}
       TWITTER_CONSUMER_SECRET: ${ssm:Twitter_Consumer_Secret~true}
