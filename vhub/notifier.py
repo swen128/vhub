@@ -2,7 +2,6 @@ import os
 import re
 import sys
 from typing import Iterable, List, Optional
-from toolz import valmap
 from .youtube import YoutubeVideo
 
 sys.path.append("lib")
@@ -10,6 +9,7 @@ sys.path.append("lib")
 from lib import boto3
 from lib.boto3_type_annotations import dynamodb
 from lib import tweepy
+from lib.toolz import valmap
 
 
 def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[dict]:
