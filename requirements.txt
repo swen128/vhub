@@ -4,3 +4,4 @@ boto3_type_annotations
 toolz
 google-api-python-client
 rsa<=3.5.0,>=3.1.4
+tweepy
