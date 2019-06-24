@@ -11,11 +11,12 @@ from lib.googleapiclient.discovery import build
 class YoutubeVideo:
     def __init__(self, url: str, channel_url=None, title=None,
                  description=None, published_at=None, tags=None, thumbnails=None,
-                 live_broadcast_content=None, n_watch=None, n_like=None,
+                 channel_title=None, live_broadcast_content=None, n_watch=None, n_like=None,
                  category_id=None, default_language=None, localized=None):
         if is_valid_youtube_video_url(url):
             self.url = url
             self.channel_url = channel_url
+            self.channel_title = channel_title
             self.title = title
             self.description = description
             self.published_at = published_at
@@ -66,6 +67,7 @@ class YouTube:
                 n_watch=video.n_watch,
                 n_like=video.n_like,
                 channel_url=channel_url,
+                channel_title=s.get('channelTitle'),
                 title=s.get('title'),
                 description=s.get('description'),
                 published_at=s.get('publishedAt'),
