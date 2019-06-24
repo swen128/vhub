@@ -21,6 +21,19 @@
                     },
                     "description": {
                         "S": "description"
+                    },
+                    "default_language": {
+                        "NULL": true
+                    },
+                    "tags": {
+                        "L": [
+                            {
+                                "S": "VTuber"
+                            },
+                            {
+                                "S": "vtuber"
+                            }
+                        ]
                     }
                 },
                 "ApproximateCreationDateTime": 1428537600,

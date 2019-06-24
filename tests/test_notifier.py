@@ -62,7 +62,9 @@ class TestVideoFromEvent(unittest.TestCase):
         ground_truth = YoutubeVideo(
             url="https://www.youtube.com/watch?v=KNi82VggtBo",
             title="title",
-            description="description"
+            description="description",
+            tags=["VTuber", "vtuber"],
+            default_language=None
         )
 
         self.assertDictEqual(vars(out), vars(ground_truth))
