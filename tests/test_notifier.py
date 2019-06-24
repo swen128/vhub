@@ -1,15 +1,45 @@
 import boto3
 import json
 import unittest
-from moto import mock_dynamodb2, mock_s3
+from moto import mock_dynamodb2
 from textwrap import dedent
-from vhub.notifier import mentioned_channel_urls, video_from_event, message
+from vhub.notifier import vtuber_channel_detail, mentioned_channel_urls, video_from_event, message
 from vhub.youtube import YoutubeVideo
 
 
 def read_file(path: str) -> str:
     with open(path, 'r') as f:
         return f.read()
+
+
+class TestVtuberChannelDetail(unittest.TestCase):
+    @mock_dynamodb2
+    def test_not_found(self):
+        db = boto3.resource('dynamodb', region_name='us-east-2')
+        db.create_table(
+            TableName='Channels',
+            KeySchema=[
+                {
+                    'AttributeName': 'url',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'url',
+                    'AttributeType': 'S'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        table = db.Table('Channels')
+        url = "https://www.youtube.com/channel/test"
+        out = vtuber_channel_detail(url, table)
+
+        self.assertIsNone(out)
 
 
 class TestMentionedChannelUrls(unittest.TestCase):
