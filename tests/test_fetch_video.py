@@ -1,12 +1,9 @@
+import boto3
 import sys
 import unittest
 from moto import mock_dynamodb2, mock_s3
 from vhub.fetch_video import parse_videos_list, save_video, get_previous_object
 from vhub.youtube import YoutubeVideo
-
-sys.path.append("lib")
-
-from lib import boto3
 
 
 def read_file(path: str) -> str:

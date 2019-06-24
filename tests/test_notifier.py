@@ -1,14 +1,10 @@
+import boto3
 import json
-import sys
 import unittest
 from moto import mock_dynamodb2, mock_s3
 from textwrap import dedent
 from vhub.notifier import mentioned_channel_urls, video_from_event, message
 from vhub.youtube import YoutubeVideo
-
-sys.path.append("lib")
-
-from lib import boto3
 
 
 def read_file(path: str) -> str:

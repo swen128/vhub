@@ -1,3 +1,4 @@
+import boto3
 import gzip
 import io
 import json
@@ -9,7 +10,6 @@ from .youtube import YoutubeChannel
 
 sys.path.append("lib")
 
-from lib import boto3
 from lib.boto3_type_annotations import s3, dynamodb
 
 

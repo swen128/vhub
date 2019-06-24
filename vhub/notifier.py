@@ -1,13 +1,13 @@
 import os
 import re
 import sys
+import boto3
+from boto3.dynamodb.types import TypeDeserializer
 from typing import Iterable, List, Optional
 from .youtube import YoutubeVideo
 
 sys.path.append("lib")
 
-from lib import boto3
-from lib.boto3.dynamodb.types import TypeDeserializer
 from lib.boto3_type_annotations import dynamodb
 from lib import tweepy
 from lib.toolz import valmap
