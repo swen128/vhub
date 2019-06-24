@@ -68,7 +68,7 @@ class TestSaveVideo(unittest.TestCase):
 
         db = boto3.resource('dynamodb', region_name='us-east-2')
         db.create_table(
-        TableName='Videos',
+            TableName='Videos',
             KeySchema=[
                 {
                     'AttributeName': 'url',
