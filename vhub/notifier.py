@@ -25,7 +25,7 @@ def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
     else:
         channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]+"
         urls = re.findall(channel_url_regex, video.description)
-        return list({video.channel_url} | set(urls))
+        return list(set(urls) - {video.channel_url})
 
 
 def mentioned_vtuber_channels(video: YoutubeVideo, table: dynamodb.Table) -> Iterable[dict]:
@@ -52,6 +52,7 @@ def message(video: YoutubeVideo, channels: Iterable[dict]) -> str:
         video.url + '\n' + \
         '\n' + \
         '【参加者】\n' + \
+        video.channel_title + '\n' + \
         '\n'.join(channel_names)
 
 

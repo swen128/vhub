@@ -53,7 +53,7 @@ class TestMentionedChannelUrls(unittest.TestCase):
 
         out = mentioned_channel_urls(video)
         
-        self.assertEqual(out, [url])
+        self.assertEqual(out, [])
 
     def test_mentions(self):
         url_1 = "https://www.youtube.com/channel/UC6oDys1BGgBsIC3WhG1BovQ"
@@ -68,7 +68,7 @@ class TestMentionedChannelUrls(unittest.TestCase):
 
         out = mentioned_channel_urls(video)
         
-        self.assertSetEqual(set(out), {url_1, url_2, url_3})
+        self.assertSetEqual(set(out), {url_1, url_2})
 
 
 class TestVideoFromEvent(unittest.TestCase):
@@ -91,7 +91,8 @@ class TestMessage(unittest.TestCase):
     def test_simple(self):
         video = YoutubeVideo(
             url="https://www.youtube.com/watch?v=KNi82VggtBo",
-            title="title"
+            title="title",
+            channel_title="host_channel"
         )
         channels = [
             {'name': 'channel_1'},
@@ -105,6 +106,7 @@ class TestMessage(unittest.TestCase):
             https://www.youtube.com/watch?v=KNi82VggtBo
             
             【参加者】
+            host_channel
             channel_1
             channel_2"""
         )
