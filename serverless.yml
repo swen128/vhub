@@ -40,24 +40,6 @@ functions:
           - s3:GetObject
         Resource:
           - arn:aws:s3:::crawled-webpages/*
-  fetch_channel:
-    handler: vhub.fetch_channel.lambda_handler
-    events:
-      - s3: crawled-channels
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-          - dynamodb:UpdateItem
-        Resource:
-          Fn::GetAtt:
-            - ChannelsTable
-            - Arn
-      - Effect: Allow
-        Action:
-          - s3:GetObject
-        Resource:
-          - arn:aws:s3:::crawled-channels/*
   notifier:
     handler: vhub.notifier.lambda_handler
     events:
