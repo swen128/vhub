@@ -35,7 +35,7 @@ class YoutubeVideo:
 class YouTube:
     def __init__(self, secret: str, version: str = "v3", http=None):
         self.youtube = build("youtube", version,
-                             developerKey=secret, http=http)
+                             developerKey=secret, http=http, cache_discovery=False)
 
     def _get_video_by_id(self, video_id: str) -> dict:
         req = self.youtube.videos().list(part="snippet", id=video_id)
