@@ -69,7 +69,7 @@ def lambda_handler(event, context):
     table = db.Table('Channels')
 
     video = video_from_event(event)
-    channels = mentioned_vtuber_channels(video, table)
+    channels = list(mentioned_vtuber_channels(video, table))
 
     if any(channels):
         twitter.update_status(message(video, channels))
