@@ -41,6 +41,37 @@ class TestVtuberChannelDetail(unittest.TestCase):
 
         self.assertIsNone(out)
 
+    @mock_dynamodb2
+    def test_found(self):
+        url = "https://www.youtube.com/channel/test"
+        item = {'url': url, 'name': 'name'}
+        db = boto3.resource('dynamodb', region_name='us-east-2')
+        db.create_table(
+            TableName='Channels',
+            KeySchema=[
+                {
+                    'AttributeName': 'url',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'url',
+                    'AttributeType': 'S'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        table = db.Table('Channels')
+        table.put_item(Item=item)
+        
+        out = vtuber_channel_detail(url, table)
+
+        self.assertDictEqual(out, item)
+
 
 class TestMentionedChannelUrls(unittest.TestCase):
     def test_self_mention(self):
