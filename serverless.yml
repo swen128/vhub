@@ -20,6 +20,7 @@ functions:
       - s3: crawled-webpages
     environment:
       GOOGLE_CLOUD_API_KEY: ${ssm:Google_Cloud_API_key~true}
+    timeout: 900
     iamRoleStatements:
       - Effect: Allow
         Action:
