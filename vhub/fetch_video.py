@@ -91,7 +91,7 @@ def get_new_videos(new: s3.Object, prev: Optional[s3.Object]) -> Iterable[Youtub
     if prev is None:
         return set(new_videos)
     else:
-        prev_videos = parse_videos_list(extract_html(new))
+        prev_videos = parse_videos_list(extract_html(prev))
         return set(new_videos) - set(prev_videos)
 
 
