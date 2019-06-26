@@ -130,16 +130,41 @@ class TestMessage(unittest.TestCase):
             {'name': 'channel_2'}
         ]
         out = message(video, channels)
-        ground_truth = dedent(
+        
+        mes_short = dedent(
             """\
-            #新着VTuberコラボ動画
+            #VTuberコラボ通知
+            https://youtu.be/KNi82VggtBo"""
+        )
+        mes_mid = dedent(
+            """\
+            #VTuberコラボ通知
             title
-            https://www.youtube.com/watch?v=KNi82VggtBo
+            https://youtu.be/KNi82VggtBo"""
+        )
+        mes_long = dedent(
+            """\
+            #VTuberコラボ通知
+            https://youtu.be/KNi82VggtBo
             
             【参加者】
             host_channel
             channel_1
             channel_2"""
         )
+        mes_max = dedent(
+            """\
+            #VTuberコラボ通知
+            title
+            https://youtu.be/KNi82VggtBo
+            
+            【参加者】
+            host_channel
+            channel_1
+            channel_2"""
+        )
+        ground_truth = [mes_max, mes_long, mes_mid, mes_short]
 
-        self.assertMultiLineEqual(out, ground_truth)
+        self.assertListEqual(out, ground_truth)
+
+

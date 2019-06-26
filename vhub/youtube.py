@@ -108,3 +108,10 @@ def is_valid_youtube_video_url(url: str) -> bool:
         and o.path == '/watch' \
         and 'v' in qs \
         and re.fullmatch(r"[a-zA-Z0-9_\-]+", qs['v'][0]) is not None
+
+
+def short_youtube_video_url(url: str) -> str:
+    if is_valid_youtube_video_url(url):
+        o = urlparse(url)
+        video_id = parse_qs(o.query)['v'][0]
+        return f"https://youtu.be/{video_id}"

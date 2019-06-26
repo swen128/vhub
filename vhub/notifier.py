@@ -2,15 +2,20 @@ import os
 import re
 import sys
 import boto3
+import logging
 from boto3.dynamodb.types import TypeDeserializer
 from typing import Iterable, List, Optional
-from .youtube import YoutubeVideo
+from .youtube import YoutubeVideo, short_youtube_video_url
 
 sys.path.append("lib")
 
 from lib.boto3_type_annotations import dynamodb
 from lib import tweepy
-from lib.toolz import valmap
+from lib.toolz import valmap, get
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[dict]:
@@ -44,15 +49,36 @@ def video_from_event(event) -> YoutubeVideo:
 
 
 def message(video: YoutubeVideo, channels: Iterable[dict]) -> str:
+    url = short_youtube_video_url(video.url)
     channel_names = [channel.get('name') for channel in channels]
+    channel_names_lines = '\n'.join(channel_names)
 
-    return \
-        '#新着VTuberコラボ動画\n' + \
-        video.title + '\n' + \
-        video.url + '\n' + \
-        '\n' + \
-        '【参加者】\n' + \
-        '\n'.join(channel_names)
+    mes_short = f"#VTuberコラボ通知\n{url}"
+    mes_mid = f"#VTuberコラボ通知\n{video.title}\n{url}"
+    mes_long = f"{mes_short}\n\n【参加者】\n{channel_names_lines}"
+    mes_max = f"{mes_mid}\n\n【参加者】\n{channel_names_lines}"
+    
+    return [mes_max, mes_long, mes_mid, mes_short]
+
+
+def tweet(messages: Iterable[str], twitter: tweepy.API):
+    for message in messages:
+        try:
+            twitter.update_status(message)
+            logger.info('Tweeted: %s', message)
+            return
+        except tweepy.TweepError as e:
+            if e.api_code == 186:
+                continue
+            elif e.api_code == 187:
+                logger.warn('Attempted tweet is a duplicate and thus skipped: %s', message)
+                return
+            else:
+                logger.exception('Failed to tweet: %s')
+                return
+        except:
+            logger.exception('Failed to tweet: %s')
+            return
 
 
 def lambda_handler(event, context):
@@ -73,4 +99,6 @@ def lambda_handler(event, context):
 
     if host_channel is not None and any(mentioned_channels):
         channels = [host_channel] + mentioned_channels
-        twitter.update_status(message(video, channels))
+        messages = message(video, channels)
+
+        tweet(messages, twitter)
