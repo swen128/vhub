@@ -99,3 +99,18 @@ class TestGetVideoDetail(unittest.TestCase):
         out = youtube.get_video_detail(video)
         
         self.assertIsNone(out)
+
+
+class TestYouTubeVideoEq(unittest.TestCase):
+    def test_equal(self):
+        url = "https://www.youtube.com/watch?v=03H1qSot9_s"
+        video_1 = YoutubeVideo(url)
+        video_2 = YoutubeVideo(url)
+
+        self.assertEqual(video_1, video_2)
+
+    def test_not_equal(self):
+        video_1 = YoutubeVideo("https://www.youtube.com/watch?v=03H1qSot9_s")
+        video_2 = YoutubeVideo("https://www.youtube.com/watch?v=uaQS2ZnrFQg")
+
+        self.assertNotEqual(video_1, video_2)

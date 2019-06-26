@@ -34,6 +34,12 @@ class YoutubeVideo:
     def __str__(self):
         return str(vars(self))
 
+    def __hash__(self):
+        return hash(self.url)
+
+    def __eq__(self, other):
+        return isinstance(other, YoutubeVideo) and self.url == other.url
+
 
 class YouTube:
     def __init__(self, secret: str, version: str = "v3", http=None):
