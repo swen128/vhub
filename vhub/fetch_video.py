@@ -2,6 +2,7 @@ import boto3
 import gzip
 import io
 import json
+import logging
 import os
 import sys
 from bs4 import BeautifulSoup
@@ -13,6 +14,10 @@ sys.path.append("lib")
 
 from lib.boto3_type_annotations import s3, dynamodb
 from lib.toolz.dicttoolz import valmap, assoc
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
@@ -74,6 +79,7 @@ def get_new_videos(new: s3.Object, prev: Optional[s3.Object]) -> Iterable[Youtub
 
 
 def lambda_handler(event, context):
+    logger = logging.getLogger(__name__)
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
     
@@ -91,3 +97,4 @@ def lambda_handler(event, context):
     for video in video_details:
         if video is not None:
             save_video(table, video)
+            logger.info('A YouTube video saved: %s', video)

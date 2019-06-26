@@ -31,6 +31,9 @@ class YoutubeVideo:
         else:
             raise ValueError(f"{url} is not a valid YouTube video URL.")
 
+    def __str__(self):
+        return str(vars(self))
+
 
 class YouTube:
     def __init__(self, secret: str, version: str = "v3", http=None):
