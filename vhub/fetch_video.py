@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import sys
+from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from typing import Tuple, Iterable, Union, List, Optional
@@ -31,7 +32,13 @@ def emptystr_to_none(item):
 
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
     item = emptystr_to_none(vars(video))
-    table.put_item(Item=item)
+
+    try:
+        table.put_item(Item=item)
+        logger.info('Successfuly saved a YouTube video: %s', video)
+    except ClientError as e:
+        logger.error('Failed to save a YouTube video: %s', video)
+        logger.exception('The reason being: %s', e)
 
 
 def get_previous_object(obj: s3.Object) -> Optional[s3.Object]:
@@ -88,8 +95,18 @@ def get_new_videos(new: s3.Object, prev: Optional[s3.Object]) -> Iterable[Youtub
         return set(new_videos) - set(prev_videos)
 
 
+def get_video_details(videos: Iterable[YoutubeVideo], youtube: YouTube):
+    for video in videos:
+        try:
+            detail = youtube.get_video_detail(video)
+            if detail is not None:
+                yield detail
+        except Exception as e:
+            logger.error('YouTube API gave an error while getting details of the video: %s', video.url)
+            logger.exception('The reason being: %s', e)
+
+
 def lambda_handler(event, context):
-    logger = logging.getLogger(__name__)
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
     
@@ -100,11 +117,9 @@ def lambda_handler(event, context):
     youtube_api_key = os.environ['GOOGLE_CLOUD_API_KEY']
     youtube = YouTube(youtube_api_key)
 
-    video_details = map(youtube.get_video_detail, new_videos)
+    video_details = get_video_details(new_videos, youtube)
 
     table = boto3.resource('dynamodb').Table('Videos')
 
     for video in video_details:
-        if video is not None:
-            save_video(table, video)
-            logger.info('A YouTube video saved: %s', video)
+        save_video(table, video)
