@@ -133,9 +133,9 @@ class TestSaveVideo(unittest.TestCase):
         
         response = table.get_item(Key={"url": url})
         out = response['Item']
+        ground_truth = vars(video)
 
-        self.assertEqual(out['url'], url)
-        self.assertEqual(out['title'], "title")
+        self.assertDictEqual(out, ground_truth)
 
 
 class TestGetPreviousObject(unittest.TestCase):
