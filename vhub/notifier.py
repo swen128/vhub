@@ -52,7 +52,6 @@ def message(video: YoutubeVideo, channels: Iterable[dict]) -> str:
         video.url + '\n' + \
         '\n' + \
         '【参加者】\n' + \
-        video.channel_title + '\n' + \
         '\n'.join(channel_names)
 
 
@@ -69,7 +68,9 @@ def lambda_handler(event, context):
     table = db.Table('Channels')
 
     video = video_from_event(event)
-    channels = list(mentioned_vtuber_channels(video, table))
+    host_channel = vtuber_channel_detail(video.channel_url, table)
+    mentioned_channels = list(mentioned_vtuber_channels(video, table))
 
-    if any(channels):
+    if host_channel is not None and any(mentioned_channels):
+        channels = [host_channel] + mentioned_channels
         twitter.update_status(message(video, channels))

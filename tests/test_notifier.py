@@ -122,10 +122,10 @@ class TestMessage(unittest.TestCase):
     def test_simple(self):
         video = YoutubeVideo(
             url="https://www.youtube.com/watch?v=KNi82VggtBo",
-            title="title",
-            channel_title="host_channel"
+            title="title"
         )
         channels = [
+            {'name': 'host_channel'},
             {'name': 'channel_1'},
             {'name': 'channel_2'}
         ]
