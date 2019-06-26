@@ -113,6 +113,10 @@ def lambda_handler(event, context):
     new_obj = boto3.resource('s3').Object(bucket, key)
     prev_obj = get_previous_object(new_obj)
     new_videos = get_new_videos(new_obj, prev_obj)
+
+    logger.info("New version of the crawled webpage: %s", new_obj.key)
+    logger.info("Previous version of the crawled webpage: %s", prev_obj.key)
+    logger.info('New videos: %s', [video.url for video in new_videos])
     
     youtube_api_key = os.environ['GOOGLE_CLOUD_API_KEY']
     youtube = YouTube(youtube_api_key)
