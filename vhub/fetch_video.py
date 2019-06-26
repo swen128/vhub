@@ -20,8 +20,18 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
+def emptystr_to_none(item):
+    if isinstance(item, list):
+        return list(map(emptystr_to_none, item))
+    if isinstance(item, dict):
+        return valmap(emptystr_to_none, item)
+    else:
+        return None if item == "" else item
+
+
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
-    table.put_item(Item=vars(video))
+    item = emptystr_to_none(vars(video))
+    table.put_item(Item=item)
 
 
 def get_previous_object(obj: s3.Object) -> Optional[s3.Object]:

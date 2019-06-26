@@ -29,6 +29,47 @@ class TestParseVideosList(unittest.TestCase):
 
 class TestSaveVideo(unittest.TestCase):
     @mock_dynamodb2
+    def test_empty_string(self):
+        """
+        DynamoDB does not accept objects with an empty string in its attribute.
+        See, e.g., https://github.com/aws/aws-sdk-java/issues/1189
+
+        The function `save_video` thus should replace empty strings with `None` before saving.
+        """
+        url = "https://www.youtube.com/watch?v=03H1qSot9_s"
+        video = YoutubeVideo(url=url, title="")
+        
+        db = boto3.resource('dynamodb', region_name='us-east-2')
+        db.create_table(
+            TableName='Videos',
+            KeySchema=[
+                {
+                    'AttributeName': 'url',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'url',
+                    'AttributeType': 'S'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        table = db.Table('Videos')
+
+        save_video(table, video)
+        
+        response = table.get_item(Key={"url": url})
+        out = response['Item']
+
+        self.assertEqual(out['url'], url)
+        self.assertEqual(out['title'], None)
+
+    @mock_dynamodb2
     def test_video(self):
         url = "https://www.youtube.com/watch?v=03H1qSot9_s"
         video = YoutubeVideo(
