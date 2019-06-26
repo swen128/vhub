@@ -74,15 +74,18 @@ def parse_videos_list(html: str) -> Iterable[YoutubeVideo]:
 
     for table in soup.select("table"):
         for video in table.select("tbody > tr"):
-            def f(selector: str) -> int:
-                elem = video.select_one(selector).next_sibling
-                return int(elem.string.strip().replace(',', ''))
-            
-            yield YoutubeVideo(
-                url = video['data-video-url'],
-                n_watch = f('i.fa-eye'),
-                n_like = f('i.fa-thumbs-up')
-            )
+            if video.has_attr('data-video-url'):
+                def f(selector: str) -> int:
+                    elem = video.select_one(selector).next_sibling
+                    return int(elem.string.strip().replace(',', ''))
+                
+                yield YoutubeVideo(
+                    url = video['data-video-url'],
+                    n_watch = f('i.fa-eye'),
+                    n_like = f('i.fa-thumbs-up')
+                )
+            else:
+                logger.info("Failed to get a video URL from the HTML element: %s", video)
 
 
 def get_new_videos(new: s3.Object, prev: Optional[s3.Object]) -> Iterable[YoutubeVideo]:
