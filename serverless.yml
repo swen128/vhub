@@ -2,6 +2,7 @@ service: vhub
 
 plugins:
   - serverless-iam-roles-per-function
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
@@ -18,8 +19,6 @@ functions:
     handler: vhub.fetch_video.lambda_handler
     events:
       - s3: crawled-webpages
-    environment:
-      GOOGLE_CLOUD_API_KEY: ${ssm:Google_Cloud_API_key~true}
     timeout: 900
     iamRoleStatements:
       - Effect: Allow
@@ -50,11 +49,6 @@ functions:
             Fn::GetAtt:
               - VideosTable
               - StreamArn
-    environment:
-      TWITTER_CONSUMER_KEY: ${ssm:Twitter_Consumer_Key~true}
-      TWITTER_CONSUMER_SECRET: ${ssm:Twitter_Consumer_Secret~true}
-      TWITTER_ACCESS_TOKEN: ${ssm:Twitter_Access_Token~true}
-      TWITTER_ACCESS_SECRET: ${ssm:Twitter_Access_Secret~true}
     iamRoleStatements:
       - Effect: Allow
         Action:

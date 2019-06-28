@@ -25,6 +25,7 @@ var/
 /setup.cfg
 __pycache__/
 /node_modules/
+.env
 
 # dependencies
 /bs4/
