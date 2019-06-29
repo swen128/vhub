@@ -36,7 +36,7 @@ def save_video(table: dynamodb.Table, video: YoutubeVideo):
 
     try:
         table.put_item(Item=item)
-        logger.info('Successfuly saved a YouTube video: %s', video)
+        logger.info('Successfully saved a YouTube video: %s', video)
     except ClientError as e:
         logger.error('Failed to save a YouTube video: %s', video)
         logger.exception('The reason being: %s', e)
