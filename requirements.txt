@@ -2,3 +2,6 @@ boto3_type_annotations
 toolz
 google-api-python-client
 tweepy
+beautifulsoup4
+lxml
+html5lib

@@ -6,13 +6,14 @@ import logging
 import os
 import sys
 from botocore.exceptions import ClientError
-from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from typing import Tuple, Iterable, Union, List, Optional
 from .youtube import YouTube, YoutubeVideo
 
 sys.path.append("lib")
+sys.path.append("lib.bs4")
 
+from bs4 import BeautifulSoup
 from lib.boto3_type_annotations import s3, dynamodb
 from lib.toolz.dicttoolz import valmap, assoc
 
