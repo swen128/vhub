@@ -13,14 +13,14 @@ def read_file(path: str) -> str:
 
 class TestParseVideosList(unittest.TestCase):
     def test_minimal_html(self):
-        html = read_file('tests/html/vtuber_ranking/minimal.html')
+        html = read_file('tests/html/vtuber_antenna/minimal.html')
         videos = parse_videos_list(html)
 
         for video in videos:
             self.assertIsInstance(video, YoutubeVideo)
 
     def test_real_html(self):
-        html = read_file('tests/html/vtuber_ranking/real.html')
+        html = read_file('tests/html/vtuber_antenna/real.html')
         videos = parse_videos_list(html)
 
         for video in videos:

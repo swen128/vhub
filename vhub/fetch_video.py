@@ -68,25 +68,21 @@ def extract_html(obj: s3.Object) -> str:
 
 
 def parse_videos_list(html: str) -> Iterable[YoutubeVideo]:
+    """
+    Parse the web page: https://vtuber-antenna.net/new/.
+    """
     try:
         soup = BeautifulSoup(html, "lxml")
     except:
         soup = BeautifulSoup(html, "html5lib")
 
-    for table in soup.select("table"):
-        for video in table.select("tbody > tr"):
-            if video.has_attr('data-video-url'):
-                def f(selector: str) -> int:
-                    elem = video.select_one(selector).next_sibling
-                    return int(elem.string.strip().replace(',', ''))
-                
-                yield YoutubeVideo(
-                    url = video['data-video-url'],
-                    n_watch = f('i.fa-eye'),
-                    n_like = f('i.fa-thumbs-up')
-                )
-            else:
-                logger.info("Failed to get a video URL from the HTML element: %s", video)
+    videos = soup.select("div#main-area div.movie ul.movieList.new li:not(.empty)")
+
+    for video in videos:
+        a = video.select_one("p.movieTitle a")
+        url = a["href"]
+
+        yield YoutubeVideo(url)
 
 
 def get_new_videos(new: s3.Object, prev: Optional[s3.Object]) -> Iterable[YoutubeVideo]:

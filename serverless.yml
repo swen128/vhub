@@ -15,10 +15,21 @@ package:
     - tests/**
 
 functions:
+  fetch_vtuber_antenna:
+    handler: vhub.fetch_vtuber_antenna.lambda_handler
+    events:
+      - schedule: rate(5 minutes)
+    timeout: 10
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource:
+          - arn:aws:s3:::crawled-webpages-vtuber-antenna/*
   fetch_video:
     handler: vhub.fetch_video.lambda_handler
     events:
-      - s3: crawled-webpages
+      - s3: crawled-webpages-vtuber-antenna
     timeout: 900
     iamRoleStatements:
       - Effect: Allow
@@ -33,12 +44,12 @@ functions:
         Action:
           - s3:ListBucket
         Resource:
-          - arn:aws:s3:::crawled-webpages
+          - arn:aws:s3:::crawled-webpages-vtuber-antenna
       - Effect: Allow
         Action:
           - s3:GetObject
         Resource:
-          - arn:aws:s3:::crawled-webpages/*
+          - arn:aws:s3:::crawled-webpages-vtuber-antenna/*
   notifier:
     handler: vhub.notifier.lambda_handler
     events:
