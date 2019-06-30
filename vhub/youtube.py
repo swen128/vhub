@@ -1,6 +1,6 @@
 import re
 import sys
-from typing import Optional
+from typing import Optional, List
 from urllib.parse import urlparse, parse_qs
 
 sys.path.append("lib")
@@ -103,6 +103,15 @@ def is_valid_youtube_channel_url(url: str) -> bool:
     channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]{20,}"
     match = re.fullmatch(channel_url_regex, url)
     return match is not None
+
+
+def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
+    if video.description is None:
+        return []
+    else:
+        channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]+"
+        urls = re.findall(channel_url_regex, video.description)
+        return list(set(urls) - {video.channel_url})
 
 
 def is_valid_youtube_video_url(url: str) -> bool:

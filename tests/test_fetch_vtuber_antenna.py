@@ -6,11 +6,6 @@ from moto import mock_s3
 from vhub.fetch_vtuber_antenna import save_zipped_response
 
 
-def read_file(path: str) -> str:
-    with open(path, 'r') as f:
-        return f.read()
-
-
 class TestSaveZippedResponse(unittest.TestCase):
     @mock_s3
     def test(self):

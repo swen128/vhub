@@ -1,11 +1,10 @@
 import os
-import re
 import sys
 import boto3
 import logging
 from boto3.dynamodb.types import TypeDeserializer
-from typing import Iterable, List, Optional
-from .youtube import YoutubeVideo, short_youtube_video_url
+from typing import Iterable, Optional
+from .youtube import YoutubeVideo, short_youtube_video_url, mentioned_channel_urls
 
 sys.path.append("lib")
 
@@ -22,15 +21,6 @@ def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[dict]:
     response = table.get_item(Key={'url': url})
 
     return response.get('Item')
-
-
-def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
-    if video.description is None:
-        return []
-    else:
-        channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]+"
-        urls = re.findall(channel_url_regex, video.description)
-        return list(set(urls) - {video.channel_url})
 
 
 def mentioned_vtuber_channels(video: YoutubeVideo, table: dynamodb.Table) -> Iterable[dict]:

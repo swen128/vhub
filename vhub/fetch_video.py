@@ -1,34 +1,22 @@
 import boto3
-import gzip
-import io
 import json
 import logging
 import os
 import sys
 from botocore.exceptions import ClientError
-from datetime import datetime, timedelta
-from typing import Tuple, Iterable, Union, List, Optional
+from typing import Iterable, Optional
 from .youtube import YouTube, YoutubeVideo
+from .utils import emptystr_to_none, extract_gzip
 
 sys.path.append("lib")
 sys.path.append("lib.bs4")
 
 from bs4 import BeautifulSoup
 from lib.boto3_type_annotations import s3, dynamodb
-from lib.toolz.dicttoolz import valmap, assoc
 
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-
-def emptystr_to_none(item):
-    if isinstance(item, list):
-        return list(map(emptystr_to_none, item))
-    if isinstance(item, dict):
-        return valmap(emptystr_to_none, item)
-    else:
-        return None if item == "" else item
 
 
 def save_video(table: dynamodb.Table, video: YoutubeVideo):
@@ -62,9 +50,9 @@ def get_previous_object(obj: s3.Object) -> Optional[s3.Object]:
 def extract_html(obj: s3.Object) -> str:
     response = obj.get()
     body = response['Body'].read()
-    with gzip.GzipFile(fileobj=io.BytesIO(body), mode='rb') as fh:
-        dic = json.load(fh)
-        return dic['body']
+    dic = json.loads(extract_gzip(body))
+    
+    return dic['body']
 
 
 def parse_videos_list(html: str) -> Iterable[YoutubeVideo]:
@@ -95,7 +83,7 @@ def get_new_videos(new: s3.Object, prev: Optional[s3.Object]) -> Iterable[Youtub
         return set(new_videos) - set(prev_videos)
 
 
-def get_video_details(videos: Iterable[YoutubeVideo], youtube: YouTube):
+def get_video_details(videos: Iterable[YoutubeVideo], youtube: YouTube) -> Iterable[YoutubeVideo]:
     for video in videos:
         try:
             detail = youtube.get_video_detail(video)

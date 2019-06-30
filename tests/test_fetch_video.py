@@ -3,12 +3,8 @@ import sys
 import unittest
 from moto import mock_dynamodb2, mock_s3
 from vhub.fetch_video import parse_videos_list, save_video, get_previous_object
+from vhub.utils import read_file
 from vhub.youtube import YoutubeVideo
-
-
-def read_file(path: str) -> str:
-    with open(path, 'r') as f:
-        return f.read()
 
 
 class TestParseVideosList(unittest.TestCase):
