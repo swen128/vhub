@@ -51,24 +51,36 @@ def message(video: YoutubeVideo, channels: Iterable[dict]) -> str:
     return [mes_max, mes_long, mes_mid, mes_short]
 
 
+def tweet_(message: str, twitter: tweepy.API):
+    """
+    Try to tweet a single `message` and log the result.
+    Raises a `ValueError` iff `message` is too long to tweet.
+    """
+    try:
+        twitter.update_status(message)
+        logger.info('Tweeted: %s', message)
+    except tweepy.TweepError as e:
+        if e.api_code == 186:
+            raise ValueError("The message is too long to tweet.")
+        else:
+            logger.error('Failed to tweet: %s', message)
+            logger.exception('The reason being: %s', e)
+    except Exception as e:
+        logger.error('Failed to tweet: %s', message)
+        logger.exception('The reason being: %s', e)
+
+
 def tweet(messages: Iterable[str], twitter: tweepy.API):
+    """
+    Tweet the first message in `messages` having an appropriate length.
+    `messages` are assumed to be sorted by length in descending order.
+    """
     for message in messages:
         try:
-            twitter.update_status(message)
-            logger.info('Tweeted: %s', message)
+            tweet_(message, twitter)
             return
-        except tweepy.TweepError as e:
-            if e.api_code == 186:
-                continue
-            elif e.api_code == 187:
-                logger.warn('Attempted tweet is a duplicate and thus skipped: %s', message)
-                return
-            else:
-                logger.exception('Failed to tweet: %s')
-                return
-        except:
-            logger.exception('Failed to tweet: %s')
-            return
+        except ValueError:
+            pass
 
 
 def lambda_handler(event, context):
