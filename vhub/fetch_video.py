@@ -119,7 +119,8 @@ def lambda_handler(event, context):
     new_videos = get_new_videos(new_obj, prev_obj)
 
     logger.info("New version of the crawled webpage: %s", new_obj.key)
-    logger.info("Previous version of the crawled webpage: %s", prev_obj.key)
+    if prev_obj is not None:
+        logger.info("Previous version of the crawled webpage: %s", prev_obj.key)
     logger.info('New videos: %s', [video.url for video in new_videos])
     
     youtube_api_key = os.environ['GOOGLE_CLOUD_API_KEY']
