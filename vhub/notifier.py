@@ -38,7 +38,7 @@ def video_from_event(event) -> YoutubeVideo:
     return YoutubeVideo(**dic)
 
 
-def message(video: YoutubeVideo, channels: Iterable[dict]) -> str:
+def message(video: YoutubeVideo, channels: Iterable[dict]) -> Iterable[str]:
     url = short_youtube_video_url(video.url)
     channel_names = [channel.get('name') for channel in channels]
     channel_names_lines = '\n'.join(channel_names)
