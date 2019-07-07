@@ -17,13 +17,13 @@
                         "S": "https://www.youtube.com/watch?v=test_video"
                     },
                     "channel_url": {
-                        "S": "https://www.youtube.com/channel/test_channel_0"
+                        "S": "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
                     },
                     "title": {
                         "S": "test_title"
                     },
                     "description": {
-                        "S": "The other guy's channel: https://www.youtube.com/channel/test_channel_1"
+                        "S": "The other guy's channel: https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
                     },
                     "default_language": {
                         "NULL": true

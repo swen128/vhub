@@ -32,11 +32,11 @@ def table():
 
         table.put_item(Item={
             "name": "test_channel_0",
-            "url": "https://www.youtube.com/channel/test_channel_0"
+            "url": "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
         })
         table.put_item(Item={
             "name": "test_channel_1",
-            "url": "https://www.youtube.com/channel/test_channel_1"
+            "url": "https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
         })
 
         yield table
