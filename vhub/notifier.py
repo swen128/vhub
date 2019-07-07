@@ -114,6 +114,8 @@ def lambda_handler(event, context):
     db = boto3.resource('dynamodb')
     table = db.Table('Channels')
 
-    messages = main(event, table)
+    video, channels = main(event, table)
 
-    tweet(messages, twitter)
+    if len(channels) >= 2:
+        messages = message(video, channels)
+        tweet(messages, twitter)
