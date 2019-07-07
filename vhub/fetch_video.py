@@ -94,11 +94,11 @@ def get_video_details(videos: Iterable[YoutubeVideo], youtube: YouTube) -> Itera
             logger.exception('The reason being: %s', e)
 
 
-def lambda_handler(event, context):
+def main(event, s3_client: s3.Client, youtube: YouTube) -> Iterable[YoutubeVideo]:
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
     
-    new_obj = boto3.resource('s3').Object(bucket, key)
+    new_obj = s3_client.Object(bucket, key)
     prev_obj = get_previous_object(new_obj)
     new_videos = get_new_videos(new_obj, prev_obj)
 
@@ -107,12 +107,16 @@ def lambda_handler(event, context):
         logger.info("Previous version of the crawled webpage: %s", prev_obj.key)
     logger.info('New videos: %s', [video.url for video in new_videos])
     
+    return get_video_details(new_videos, youtube)
+
+
+def lambda_handler(event, context):
+    s3_client = boto3.resource('s3')
+    table = boto3.resource('dynamodb').Table('Videos')
     youtube_api_key = os.environ['GOOGLE_CLOUD_API_KEY']
     youtube = YouTube(youtube_api_key)
 
-    video_details = get_video_details(new_videos, youtube)
-
-    table = boto3.resource('dynamodb').Table('Videos')
+    video_details = main(event, s3_client, youtube)
 
     for video in video_details:
         save_video(table, video)
