@@ -38,6 +38,16 @@ def table():
             "name": "test_channel_1",
             "url": "https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
         })
+        table.put_item(Item={
+            "created_at": "2018-10-21T10:52:42Z",
+            "n_followers": 105,
+            "n_followings": 175,
+            "n_likes": 336,
+            "n_tweets": 567,
+            "name": "test_channel_with_rich_info",
+            "twitter_url": "https://twitter.com/test_twitter_url",
+            "url": "https://www.youtube.com/channel/UC-_HZgzcDWuPT39nQQyAJDa"
+        })
 
         yield table
 
@@ -72,3 +82,14 @@ def test_none_found(table):
     video, channels = main(event, table)
 
     assert len(channels) == 0
+
+
+def test_rich_info(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/with_mention_rich_info.json")
+    video, channels = main(event, table)
+
+    channel_names = set(channel.name for channel in channels)
+
+    assert video.url == "https://www.youtube.com/watch?v=test_video"
+    assert video.title == "test_title"
+    assert channel_names == {"test_channel_0", "test_channel_with_rich_info"}
