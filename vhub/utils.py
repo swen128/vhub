@@ -1,12 +1,8 @@
 import json
-import sys
+from datetime import datetime, timezone
 from gzip import GzipFile
 from io import BytesIO
-from datetime import datetime, timezone
-
-sys.path.append("lib")
-
-from lib.toolz.dicttoolz import valmap
+from toolz.dicttoolz import valmap
 
 
 def read_file(path: str) -> str:

@@ -1,17 +1,13 @@
 import boto3
 import logging
 import json
-import sys
+import requests
+from boto3_type_annotations import s3
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from email.utils import parsedate_to_datetime
 from typing import Tuple
 from .utils import utc_now, reverse_timestamp, gzip_str
-
-sys.path.append("lib")
-
-from lib import requests
-from lib.boto3_type_annotations import s3
 
 
 logger = logging.getLogger()

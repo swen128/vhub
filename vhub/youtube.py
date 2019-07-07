@@ -1,11 +1,7 @@
 import re
-import sys
+from googleapiclient.discovery import build
 from typing import Optional, List
 from urllib.parse import urlparse, parse_qs
-
-sys.path.append("lib")
-
-from lib.googleapiclient.discovery import build
 
 
 class YoutubeVideo:

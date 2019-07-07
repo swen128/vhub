@@ -2,17 +2,12 @@ import boto3
 import json
 import logging
 import os
-import sys
 from botocore.exceptions import ClientError
+from bs4 import BeautifulSoup
+from boto3_type_annotations import s3, dynamodb
 from typing import Iterable, Optional
 from .youtube import YouTube, YoutubeVideo
 from .utils import emptystr_to_none, extract_gzip
-
-sys.path.append("lib")
-sys.path.append("lib.bs4")
-
-from bs4 import BeautifulSoup
-from lib.boto3_type_annotations import s3, dynamodb
 
 
 logger = logging.getLogger()

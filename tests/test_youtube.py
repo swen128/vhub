@@ -1,13 +1,8 @@
 import json
-import sys
 import unittest
-from vhub.fetch_video import parse_videos_list
+from googleapiclient.http import HttpMockSequence
 from vhub.utils import read_file
 from vhub.youtube import is_valid_youtube_video_url, YouTube, YoutubeVideo
-
-sys.path.append('lib')
-
-from lib.googleapiclient.http import HttpMockSequence
 
 
 api_discovery = read_file("tests/api_responses/youtube/discovery.json")

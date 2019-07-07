@@ -3,6 +3,7 @@ service: vhub
 plugins:
   - serverless-iam-roles-per-function
   - serverless-dotenv-plugin
+  - serverless-python-requirements
 
 provider:
   name: aws
