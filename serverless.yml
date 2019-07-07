@@ -4,11 +4,17 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-dotenv-plugin
   - serverless-python-requirements
+  - serverless-prune-plugin
 
 provider:
   name: aws
   runtime: python3.7
   region: us-east-2
+
+custom:
+  prune:
+    automatic: true
+    number: 10
 
 package:
   exclude:
