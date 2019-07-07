@@ -13,6 +13,9 @@ package:
   exclude:
     - node_modules/**
     - tests/**
+    - venv/**
+    - .pytest_cache/**
+    - .vscode/**
 
 functions:
   fetch_vtuber_antenna:
