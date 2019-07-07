@@ -49,7 +49,7 @@ def test_found(table):
     channel_names = set(channel.name for channel in channels)
     
     assert video.url == "https://www.youtube.com/watch?v=test_video"
-    assert video.title == "test_video"
+    assert video.title == "test_title"
     assert channel_names == {"test_channel_0", "test_channel_1"}
 
 
