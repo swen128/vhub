@@ -10,6 +10,7 @@ provider:
   name: aws
   runtime: python3.7
   region: us-east-2
+  logRetentionInDays: 30
 
 custom:
   prune:
