@@ -26,3 +26,5 @@ var/
 __pycache__/
 /node_modules/
 .env
+/.idea/
+*.iml
