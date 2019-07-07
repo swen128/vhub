@@ -1,16 +1,13 @@
 import boto3
-import json
-import unittest
+import pytest
 from moto import mock_dynamodb2
-from textwrap import dedent
-from vhub.notifier import vtuber_channel_detail, mentioned_channel_urls, video_from_event, message
-from vhub.utils import read_file
-from vhub.youtube import YoutubeVideo
+from vhub.notifier import main
+from vhub.utils import read_json
 
 
-class TestVtuberChannelDetail(unittest.TestCase):
-    @mock_dynamodb2
-    def test_not_found(self):
+@pytest.fixture
+def table():
+    with mock_dynamodb2():
         db = boto3.resource('dynamodb', region_name='us-east-2')
         db.create_table(
             TableName='Channels',
@@ -32,135 +29,67 @@ class TestVtuberChannelDetail(unittest.TestCase):
             }
         )
         table = db.Table('Channels')
-        url = "https://www.youtube.com/channel/test"
-        out = vtuber_channel_detail(url, table)
 
-        self.assertIsNone(out)
+        table.put_item(Item={
+            "name": "test_channel_0",
+            "url": "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+        })
+        table.put_item(Item={
+            "name": "test_channel_1",
+            "url": "https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
+        })
+        table.put_item(Item={
+            "created_at": "2018-10-21T10:52:42Z",
+            "n_followers": 105,
+            "n_followings": 175,
+            "n_likes": 336,
+            "n_tweets": 567,
+            "name": "test_channel_with_rich_info",
+            "twitter_url": "https://twitter.com/test_twitter_url",
+            "url": "https://www.youtube.com/channel/UC-_HZgzcDWuPT39nQQyAJDa"
+        })
 
-    @mock_dynamodb2
-    def test_found(self):
-        url = "https://www.youtube.com/channel/test"
-        item = {'url': url, 'name': 'name'}
-        db = boto3.resource('dynamodb', region_name='us-east-2')
-        db.create_table(
-            TableName='Channels',
-            KeySchema=[
-                {
-                    'AttributeName': 'url',
-                    'KeyType': 'HASH'
-                }
-            ],
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'url',
-                    'AttributeType': 'S'
-                },
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            }
-        )
-        table = db.Table('Channels')
-        table.put_item(Item=item)
-        
-        out = vtuber_channel_detail(url, table)
-
-        self.assertDictEqual(out, item)
+        yield table
 
 
-class TestMentionedChannelUrls(unittest.TestCase):
-    def test_self_mention(self):
-        url = "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A"
-        video = YoutubeVideo(
-            url="https://www.youtube.com/watch?v=03H1qSot9_s",
-            channel_url=url,
-            description=f"My channel: {url}"
-        )
+def test_found(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/with_mention.json")
+    video, channels = main(event, table)
 
-        out = mentioned_channel_urls(video)
-        
-        self.assertEqual(out, [])
-
-    def test_mentions(self):
-        url_1 = "https://www.youtube.com/channel/UC6oDys1BGgBsIC3WhG1BovQ"
-        url_2 = "https://www.youtube.com/channel/UCsg-YqdqQ-KFF0LNk23BY4A"
-        url_3 = "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A"
-
-        video = YoutubeVideo(
-            url="https://www.youtube.com/watch?v=vHl9Tx-HJHw",
-            channel_url=url_3,
-            description=f"{url_1} {url_2} {url_3}"
-        )
-
-        out = mentioned_channel_urls(video)
-        
-        self.assertSetEqual(set(out), {url_1, url_2})
+    channel_names = set(channel.name for channel in channels)
+    
+    assert video.url == "https://www.youtube.com/watch?v=test_video"
+    assert video.title == "test_title"
+    assert channel_names == {"test_channel_0", "test_channel_1"}
 
 
-class TestVideoFromEvent(unittest.TestCase):
-    def test_simple(self):
-        event_raw = read_file('tests/aws_event/dynamodb/new_video.json')
-        event = json.loads(event_raw)
-        out = video_from_event(event)
-        ground_truth = YoutubeVideo(
-            url="https://www.youtube.com/watch?v=KNi82VggtBo",
-            title="title",
-            description="description",
-            tags=["VTuber", "vtuber"],
-            default_language=None
-        )
+def test_host_not_found(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/unknown_host.json")
+    video, channels = main(event, table)
 
-        self.assertDictEqual(vars(out), vars(ground_truth))
+    assert len(channels) == 1
 
 
-class TestMessage(unittest.TestCase):
-    def test_simple(self):
-        video = YoutubeVideo(
-            url="https://www.youtube.com/watch?v=KNi82VggtBo",
-            title="title"
-        )
-        channels = [
-            {'name': 'host_channel'},
-            {'name': 'channel_1'},
-            {'name': 'channel_2'}
-        ]
-        out = message(video, channels)
-        
-        mes_short = dedent(
-            """\
-            #VTuberコラボ通知
-            https://youtu.be/KNi82VggtBo"""
-        )
-        mes_mid = dedent(
-            """\
-            #VTuberコラボ通知
-            title
-            https://youtu.be/KNi82VggtBo"""
-        )
-        mes_long = dedent(
-            """\
-            #VTuberコラボ通知
-            https://youtu.be/KNi82VggtBo
-            
-            【参加者】
-            host_channel
-            channel_1
-            channel_2"""
-        )
-        mes_max = dedent(
-            """\
-            #VTuberコラボ通知
-            title
-            https://youtu.be/KNi82VggtBo
-            
-            【参加者】
-            host_channel
-            channel_1
-            channel_2"""
-        )
-        ground_truth = [mes_max, mes_long, mes_mid, mes_short]
+def test_mention_not_found(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/unknown_mention.json")
+    video, channels = main(event, table)
 
-        self.assertListEqual(out, ground_truth)
+    assert len(channels) == 1
 
 
+def test_none_found(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/unknown_host_no_mention.json")
+    video, channels = main(event, table)
+
+    assert len(channels) == 0
+
+
+def test_rich_info(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/with_mention_rich_info.json")
+    video, channels = main(event, table)
+
+    channel_names = set(channel.name for channel in channels)
+
+    assert video.url == "https://www.youtube.com/watch?v=test_video"
+    assert video.title == "test_title"
+    assert channel_names == {"test_channel_0", "test_channel_with_rich_info"}

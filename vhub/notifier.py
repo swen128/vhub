@@ -3,8 +3,8 @@ import sys
 import boto3
 import logging
 from boto3.dynamodb.types import TypeDeserializer
-from typing import Iterable, Optional
-from .youtube import YoutubeVideo, short_youtube_video_url, mentioned_channel_urls
+from typing import Iterable, Optional, Tuple, List
+from .youtube import YoutubeVideo, YoutubeChannel, short_youtube_video_url, mentioned_channel_urls
 
 sys.path.append("lib")
 
@@ -17,8 +17,14 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[dict]:
+def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[YoutubeChannel]:
     response = table.get_item(Key={'url': url})
+    dic = response.get('Item')
+
+    if dic is None:
+        return None
+    else:
+        return YoutubeChannel(url=dic['url'], name=dic['name'])
 
     return response.get('Item')
 
@@ -38,9 +44,9 @@ def video_from_event(event) -> YoutubeVideo:
     return YoutubeVideo(**dic)
 
 
-def message(video: YoutubeVideo, channels: Iterable[dict]) -> Iterable[str]:
+def message(video: YoutubeVideo, channels: Iterable[YoutubeChannel]) -> Iterable[str]:
     url = short_youtube_video_url(video.url)
-    channel_names = [channel.get('name') for channel in channels]
+    channel_names = [channel.name for channel in channels]
     channel_names_lines = '\n'.join(channel_names)
 
     mes_short = f"#VTuberコラボ通知\n{url}"
@@ -83,6 +89,19 @@ def tweet(messages: Iterable[str], twitter: tweepy.API):
             pass
 
 
+def main(event, table: dynamodb.Table) -> Optional[Tuple[YoutubeVideo, List[YoutubeChannel]]]:
+    video = video_from_event(event)
+    host_channel = vtuber_channel_detail(video.channel_url, table)
+    mentioned_channels = list(mentioned_vtuber_channels(video, table))
+
+    if host_channel is None:
+        channels = mentioned_channels
+    else:
+        channels = [host_channel] + mentioned_channels
+
+    return (video, channels)
+
+
 def lambda_handler(event, context):
     CK = os.environ['TWITTER_CONSUMER_KEY']
     CS = os.environ['TWITTER_CONSUMER_SECRET']
@@ -95,12 +114,8 @@ def lambda_handler(event, context):
     db = boto3.resource('dynamodb')
     table = db.Table('Channels')
 
-    video = video_from_event(event)
-    host_channel = vtuber_channel_detail(video.channel_url, table)
-    mentioned_channels = list(mentioned_vtuber_channels(video, table))
+    video, channels = main(event, table)
 
-    if host_channel is not None and any(mentioned_channels):
-        channels = [host_channel] + mentioned_channels
+    if len(channels) >= 2:
         messages = message(video, channels)
-
         tweet(messages, twitter)
