@@ -24,7 +24,7 @@ def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[YoutubeCh
     if dic is None:
         return None
     else:
-        return YoutubeChannel(**dic)
+        return YoutubeChannel(url=dic['url'], name=dic['name'])
 
     return response.get('Item')
 
