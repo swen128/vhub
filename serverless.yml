@@ -19,6 +19,9 @@ provider:
 
 custom:
   crawled_webpages_bucket: crawled-webpages-${self:provider.stage}
+  schedule_enabled:
+    prod: true
+    dev: false
   prune:
     automatic: true
     number: 10
@@ -35,7 +38,9 @@ functions:
   fetch_vtuber_antenna:
     handler: vhub.fetch_vtuber_antenna.lambda_handler
     events:
-      - schedule: rate(5 minutes)
+      - schedule:
+          rate: rate(5 minutes)
+          enabled: ${self:custom.schedule_enabled.${self:provider.stage}}
     timeout: 10
     iamRoleStatements:
       - Effect: Allow
