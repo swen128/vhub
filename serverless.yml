@@ -115,4 +115,4 @@ resources:
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
-          WriteCapacityUnits: 20
+          WriteCapacityUnits: 1
