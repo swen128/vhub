@@ -11,8 +11,14 @@ provider:
   runtime: python3.7
   region: us-east-2
   logRetentionInDays: 30
+  stage: ${opt:stage, 'dev'}
+  environment:
+    CRAWLED_WEBPAGE_BUCKET: ${self:custom.crawled_webpages_bucket}
+    VIDEOS_TABLE: Videos-${self:provider.stage}
+    CHANNELS_TABLE: Channels-${self:provider.stage}
 
 custom:
+  crawled_webpages_bucket: crawled-webpages-${self:provider.stage}
   prune:
     automatic: true
     number: 10
@@ -36,11 +42,11 @@ functions:
         Action:
           - s3:PutObject
         Resource:
-          - arn:aws:s3:::crawled-webpages-vtuber-antenna/*
+          - arn:aws:s3:::${self:custom.crawled_webpages_bucket}/*
   fetch_video:
     handler: vhub.fetch_video.lambda_handler
     events:
-      - s3: crawled-webpages-vtuber-antenna
+      - s3: ${self:custom.crawled_webpages_bucket}
     timeout: 900
     iamRoleStatements:
       - Effect: Allow
@@ -55,12 +61,12 @@ functions:
         Action:
           - s3:ListBucket
         Resource:
-          - arn:aws:s3:::crawled-webpages-vtuber-antenna
+          - arn:aws:s3:::${self:custom.crawled_webpages_bucket}
       - Effect: Allow
         Action:
           - s3:GetObject
         Resource:
-          - arn:aws:s3:::crawled-webpages-vtuber-antenna/*
+          - arn:aws:s3:::${self:custom.crawled_webpages_bucket}/*
   notifier:
     handler: vhub.notifier.lambda_handler
     events:
@@ -85,7 +91,7 @@ resources:
     VideosTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
-        TableName: Videos
+        TableName: Videos-${self:provider.stage}
         AttributeDefinitions:
           - AttributeName: url
             AttributeType: S
@@ -100,7 +106,7 @@ resources:
     ChannelsTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
-        TableName: Channels
+        TableName: Channels-${self:provider.stage}
         AttributeDefinitions:
           - AttributeName: url
             AttributeType: S

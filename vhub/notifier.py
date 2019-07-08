@@ -107,8 +107,8 @@ def lambda_handler(event, context):
     auth.set_access_token(AT, AS)
     twitter = tweepy.API(auth)
 
-    db = boto3.resource('dynamodb')
-    table = db.Table('Channels')
+    table_name = os.environ["CHANNELS_TABLE"]
+    table = boto3.resource('dynamodb').Table(table_name)
 
     video, channels = main(event, table)
 

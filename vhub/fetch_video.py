@@ -107,7 +107,8 @@ def main(event, s3_client: s3.Client, youtube: YouTube) -> Iterable[YoutubeVideo
 
 def lambda_handler(event, context):
     s3_client = boto3.resource('s3')
-    table = boto3.resource('dynamodb').Table('Videos')
+    table_name = os.environ["VIDEOS_TABLE"]
+    table = boto3.resource('dynamodb').Table(table_name)
     youtube_api_key = os.environ['GOOGLE_CLOUD_API_KEY']
     youtube = YouTube(youtube_api_key)
 
