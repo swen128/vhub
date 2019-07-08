@@ -68,7 +68,7 @@ functions:
         Resource:
           - arn:aws:s3:::${self:custom.crawled_webpages_bucket}/*
   notifier:
-    handler: vhub.notifier.lambda_handler
+    handler: vhub.notifier.lambda_handler_${self:provider.stage}
     events:
       - stream:
           type: dynamodb

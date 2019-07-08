@@ -98,7 +98,7 @@ def main(event, table: dynamodb.Table) -> Optional[Tuple[YoutubeVideo, List[Yout
     return (video, channels)
 
 
-def lambda_handler(event, context):
+def lambda_handler_prod(event, context):
     CK = os.environ['TWITTER_CONSUMER_KEY']
     CS = os.environ['TWITTER_CONSUMER_SECRET']
     AT = os.environ['TWITTER_ACCESS_TOKEN']
@@ -115,3 +115,13 @@ def lambda_handler(event, context):
     if len(channels) >= 2:
         messages = message(video, channels)
         tweet(messages, twitter)
+
+
+def lambda_handler_dev(event, context):
+    table_name = os.environ["CHANNELS_TABLE"]
+    table = boto3.resource('dynamodb').Table(table_name)
+
+    video, channels = main(event, table)
+    messages = message(video, channels)
+
+    logger.info(messages[0])
