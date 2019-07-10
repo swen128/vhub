@@ -1,6 +1,7 @@
 import boto3
 import logging
 import json
+import os
 import requests
 from boto3_type_annotations import s3
 from dataclasses import dataclass, asdict
@@ -53,7 +54,7 @@ def main(response: requests.Response, bucket: s3.Bucket) -> Tuple[s3.Object, Pag
 
 
 def lambda_handler(event, context):
-    bucket_name = "crawled-webpages-vtuber-antenna"
+    bucket_name = os.environ["CRAWLED_WEBPAGE_BUCKET"]
     url = "https://vtuber-antenna.net/new/"
     response = requests.get(url)
 
