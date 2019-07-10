@@ -96,7 +96,7 @@ class YoutubeChannel:
 
 
 def is_valid_youtube_channel_url(url: str) -> bool:
-    channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]{20,}"
+    channel_url_regex = r"https:\/\/www\.youtube\.com\/(?:channel|c|user)\/[a-zA-Z0-9_\-]+"
     match = re.fullmatch(channel_url_regex, url)
     return match is not None
 
@@ -105,7 +105,7 @@ def mentioned_channel_urls(video: YoutubeVideo) -> List[str]:
     if video.description is None:
         return []
     else:
-        channel_url_regex = r"https:\/\/www\.youtube\.com\/channel\/[a-zA-Z0-9_\-]+"
+        channel_url_regex = r"https:\/\/www\.youtube\.com\/(?:channel|c|user)\/[a-zA-Z0-9_\-]+"
         urls = re.findall(channel_url_regex, video.description)
         return list(set(urls) - {video.channel_url})
 
