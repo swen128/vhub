@@ -39,6 +39,14 @@ def table():
             "url": "https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
         })
         table.put_item(Item={
+            "name": "test_channel_with_dupe_name",
+            "url": "https://www.youtube.com/channel/SwW4CwHHWLQccd6Pu3nKha"
+        })
+        table.put_item(Item={
+            "name": "test_channel_with_dupe_name",
+            "url": "https://www.youtube.com/channel/MQKCcKfz5P4xhcpboXJK65"
+        })
+        table.put_item(Item={
             "created_at": "2018-10-21T10:52:42Z",
             "n_followers": 105,
             "n_followings": 175,
@@ -54,10 +62,8 @@ def table():
 
 def test_found(table):
     event = read_json("tests/aws_event/dynamodb/Videos/with_mention.json")
-    video, channels = main(event, table)
+    video, channel_names = main(event, table)
 
-    channel_names = set(channel.name for channel in channels)
-    
     assert video.url == "https://www.youtube.com/watch?v=test_video"
     assert video.title == "test_title"
     assert channel_names == {"test_channel_0", "test_channel_1"}
@@ -86,10 +92,17 @@ def test_none_found(table):
 
 def test_rich_info(table):
     event = read_json("tests/aws_event/dynamodb/Videos/with_mention_rich_info.json")
-    video, channels = main(event, table)
-
-    channel_names = set(channel.name for channel in channels)
+    video, channel_names = main(event, table)
 
     assert video.url == "https://www.youtube.com/watch?v=test_video"
     assert video.title == "test_title"
     assert channel_names == {"test_channel_0", "test_channel_with_rich_info"}
+
+
+def test_duplicate_channel_names(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/dupe_channel_name.json")
+    video, channel_names = main(event, table)
+
+    assert video.url == "https://www.youtube.com/watch?v=test_video"
+    assert video.title == "test_title"
+    assert channel_names == {"test_channel_with_dupe_name"}

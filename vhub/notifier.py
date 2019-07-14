@@ -5,7 +5,7 @@ import tweepy
 from boto3.dynamodb.types import TypeDeserializer
 from boto3_type_annotations import dynamodb
 from toolz import valmap
-from typing import Iterable, Optional, Tuple, List
+from typing import Iterable, Optional, Tuple, Set
 from .youtube import YoutubeVideo, YoutubeChannel, short_youtube_video_url, mentioned_channel_urls
 
 logger = logging.getLogger()
@@ -37,9 +37,8 @@ def video_from_event(event) -> YoutubeVideo:
     return YoutubeVideo(**dic)
 
 
-def message(video: YoutubeVideo, channels: Iterable[YoutubeChannel]) -> Iterable[str]:
+def message(video: YoutubeVideo, channel_names: Iterable[str]) -> Iterable[str]:
     url = short_youtube_video_url(video.url)
-    channel_names = [channel.name for channel in channels]
     channel_names_lines = '\n'.join(channel_names)
 
     mes_short = f"#VTuberコラボ通知\n{url}"
@@ -82,7 +81,7 @@ def tweet(messages: Iterable[str], twitter: tweepy.API):
             pass
 
 
-def main(event, table: dynamodb.Table) -> Optional[Tuple[YoutubeVideo, List[YoutubeChannel]]]:
+def main(event, table: dynamodb.Table) -> Tuple[YoutubeVideo, Set[str]]:
     video = video_from_event(event)
     host_channel = vtuber_channel_detail(video.channel_url, table)
     mentioned_channels = list(mentioned_vtuber_channels(video, table))
@@ -92,7 +91,9 @@ def main(event, table: dynamodb.Table) -> Optional[Tuple[YoutubeVideo, List[Yout
     else:
         channels = [host_channel] + mentioned_channels
 
-    return (video, channels)
+    channel_names = set(channel.name for channel in channels)
+
+    return video, channel_names
 
 
 def lambda_handler_prod(event, context):
