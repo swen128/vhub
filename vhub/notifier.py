@@ -8,7 +8,6 @@ from toolz import valmap, get
 from typing import Iterable, Optional, Tuple, List
 from .youtube import YoutubeVideo, YoutubeChannel, short_youtube_video_url, mentioned_channel_urls
 
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -34,7 +33,7 @@ def mentioned_vtuber_channels(video: YoutubeVideo, table: dynamodb.Table) -> Ite
 def video_from_event(event) -> YoutubeVideo:
     image = event['Records'][0]['dynamodb']['NewImage']
     dic = valmap(TypeDeserializer().deserialize, image)
-    
+
     return YoutubeVideo(**dic)
 
 
@@ -47,7 +46,7 @@ def message(video: YoutubeVideo, channels: Iterable[YoutubeChannel]) -> Iterable
     mes_mid = f"#VTuberコラボ通知\n{video.title}\n{url}"
     mes_long = f"{mes_short}\n\n【参加者】\n{channel_names_lines}"
     mes_max = f"{mes_mid}\n\n【参加者】\n{channel_names_lines}"
-    
+
     return [mes_max, mes_long, mes_mid, mes_short]
 
 
