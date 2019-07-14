@@ -23,7 +23,7 @@ def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[YoutubeCh
         return YoutubeChannel(url=dic['url'], name=dic['name'])
 
 
-def mentioned_vtuber_channels(video: YoutubeVideo, table: dynamodb.Table) -> Iterable[dict]:
+def mentioned_vtuber_channels(video: YoutubeVideo, table: dynamodb.Table) -> Iterable[YoutubeChannel]:
     channels = mentioned_channel_urls(video)
     details = (vtuber_channel_detail(channel, table) for channel in channels)
     vtuber_channels = (x for x in details if x is not None)
