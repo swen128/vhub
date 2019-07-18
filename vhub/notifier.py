@@ -97,22 +97,26 @@ def main(event, table: dynamodb.Table) -> Tuple[YoutubeVideo, Set[str]]:
 
 
 def lambda_handler_prod(event, context):
-    CK = os.environ['TWITTER_CONSUMER_KEY']
-    CS = os.environ['TWITTER_CONSUMER_SECRET']
-    AT = os.environ['TWITTER_ACCESS_TOKEN']
-    AS = os.environ['TWITTER_ACCESS_SECRET']
-    auth = tweepy.OAuthHandler(CK, CS)
-    auth.set_access_token(AT, AS)
-    twitter = tweepy.API(auth)
+    try:
+        CK = os.environ['TWITTER_CONSUMER_KEY']
+        CS = os.environ['TWITTER_CONSUMER_SECRET']
+        AT = os.environ['TWITTER_ACCESS_TOKEN']
+        AS = os.environ['TWITTER_ACCESS_SECRET']
+        auth = tweepy.OAuthHandler(CK, CS)
+        auth.set_access_token(AT, AS)
+        twitter = tweepy.API(auth)
 
-    table_name = os.environ["CHANNELS_TABLE"]
-    table = boto3.resource('dynamodb').Table(table_name)
+        table_name = os.environ["CHANNELS_TABLE"]
+        table = boto3.resource('dynamodb').Table(table_name)
 
-    video, channels = main(event, table)
+        video, channels = main(event, table)
 
-    if len(channels) >= 2:
-        messages = message(video, channels)
-        tweet(messages, twitter)
+        if len(channels) >= 2:
+            messages = message(video, channels)
+            tweet(messages, twitter)
+    except Exception as e:
+        logger.error('An unexpected error happened.')
+        logger.exception(e)
 
 
 def lambda_handler_dev(event, context):
