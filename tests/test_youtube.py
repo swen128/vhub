@@ -1,9 +1,10 @@
 import json
 import unittest
+
 from googleapiclient.http import HttpMockSequence
+
 from vhub.utils import read_file
 from vhub.youtube import is_valid_youtube_video_url, YouTube, YoutubeVideo
-
 
 api_discovery = read_file("tests/api_responses/youtube/discovery.json")
 PLACE_HOLDER = ""
@@ -36,13 +37,13 @@ class TestGetVideoById(unittest.TestCase):
             ({"status": 200}, response)
         ])
         youtube = YouTube(secret=PLACE_HOLDER, http=http)
-        
+
         out = youtube.get_video_by_id(id)
         ground_truth = json.loads(response)['items'][0]
 
         self.assertEqual(out['id'], id)
         self.assertDictEqual(out, ground_truth)
-    
+
     def test_not_found(self):
         id = PLACE_HOLDER
         response = read_file("tests/api_responses/youtube/videos/list/not_found.json")
@@ -88,7 +89,7 @@ class TestGetVideoDetail(unittest.TestCase):
         youtube = YouTube(secret=PLACE_HOLDER, http=http)
 
         out = youtube.get_video_detail(video)
-        
+
         self.assertIsNone(out)
 
 

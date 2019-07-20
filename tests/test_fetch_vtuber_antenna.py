@@ -3,6 +3,7 @@ import pytest
 import requests
 import requests_mock
 from moto import mock_s3
+
 from vhub.fetch_vtuber_antenna import main
 
 

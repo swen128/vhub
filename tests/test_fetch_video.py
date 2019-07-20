@@ -1,6 +1,7 @@
 import boto3
 import pytest
 from moto import mock_dynamodb2, mock_s3
+
 from vhub.fetch_video import parse_videos_list, main, save_video
 from vhub.utils import read_file, read_json
 from vhub.youtube import YoutubeVideo
@@ -112,5 +113,5 @@ def test_save_video_with_empty_string(table):
 
     response = table.get_item(Key={"url": url})
     out = response['Item']
-    
+
     assert out == vars(video)

@@ -1,6 +1,7 @@
 import boto3
 import pytest
 from moto import mock_dynamodb2
+
 from vhub.notifier import main
 from vhub.utils import read_json
 

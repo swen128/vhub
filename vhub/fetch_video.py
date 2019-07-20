@@ -1,14 +1,15 @@
-import boto3
 import json
 import logging
 import os
+from typing import Iterable, Optional
+
+import boto3
+from boto3_type_annotations import s3, dynamodb
 from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
-from boto3_type_annotations import s3, dynamodb
-from typing import Iterable, Optional
-from .youtube import YouTube, YoutubeVideo
-from .utils import emptystr_to_none, extract_gzip
 
+from .utils import emptystr_to_none, extract_gzip
+from .youtube import YouTube, YoutubeVideo
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -46,7 +47,7 @@ def extract_html(obj: s3.Object) -> str:
     response = obj.get()
     body = response['Body'].read()
     dic = json.loads(extract_gzip(body))
-    
+
     return dic['body']
 
 
@@ -92,7 +93,7 @@ def get_video_details(videos: Iterable[YoutubeVideo], youtube: YouTube) -> Itera
 def main(event, s3_client: s3.Client, youtube: YouTube) -> Iterable[YoutubeVideo]:
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
-    
+
     new_obj = s3_client.Object(bucket, key)
     prev_obj = get_previous_object(new_obj)
     new_videos = get_new_videos(new_obj, prev_obj)
@@ -101,7 +102,7 @@ def main(event, s3_client: s3.Client, youtube: YouTube) -> Iterable[YoutubeVideo
     if prev_obj is not None:
         logger.info("Previous version of the crawled webpage: %s", prev_obj.key)
     logger.info('New videos: %s', [video.url for video in new_videos])
-    
+
     return get_video_details(new_videos, youtube)
 
 
