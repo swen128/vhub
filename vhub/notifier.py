@@ -1,11 +1,13 @@
-import boto3
 import logging
 import os
+from typing import Iterable, Optional, Tuple, Set
+
+import boto3
 import tweepy
 from boto3.dynamodb.types import TypeDeserializer
 from boto3_type_annotations import dynamodb
 from toolz import valmap
-from typing import Iterable, Optional, Tuple, Set
+
 from .youtube import YoutubeVideo, YoutubeChannel, short_youtube_video_url, mentioned_channel_urls
 
 logger = logging.getLogger()

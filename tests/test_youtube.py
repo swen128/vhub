@@ -1,9 +1,10 @@
 import json
 import unittest
+
 from googleapiclient.http import HttpMockSequence
+
 from vhub.utils import read_file
 from vhub.youtube import is_valid_youtube_video_url, YouTube, YoutubeVideo
-
 
 api_discovery = read_file("tests/api_responses/youtube/discovery.json")
 PLACE_HOLDER = ""

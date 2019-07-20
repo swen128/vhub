@@ -1,14 +1,15 @@
-import boto3
 import json
 import logging
 import os
+from typing import Iterable, Optional
+
+import boto3
+from boto3_type_annotations import s3, dynamodb
 from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
-from boto3_type_annotations import s3, dynamodb
-from typing import Iterable, Optional
-from .youtube import YouTube, YoutubeVideo
-from .utils import emptystr_to_none, extract_gzip
 
+from .utils import emptystr_to_none, extract_gzip
+from .youtube import YouTube, YoutubeVideo
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

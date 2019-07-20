@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timezone
 from gzip import GzipFile
 from io import BytesIO
+
 from toolz.dicttoolz import valmap
 
 
