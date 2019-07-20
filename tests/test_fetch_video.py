@@ -113,5 +113,5 @@ def test_save_video_with_empty_string(table):
 
     response = table.get_item(Key={"url": url})
     out = response['Item']
-    
+
     assert out == vars(video)
