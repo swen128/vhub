@@ -87,11 +87,13 @@ class YouTube:
 
 
 class YoutubeChannel:
-    def __init__(self, url, name=None, n_subscriber=None):
+    def __init__(self, url, name=None, n_subscriber=None, thumbnail=None, affiliations=None):
         if is_valid_youtube_channel_url(url):
             self.url = url
             self.name = name
             self.n_subscriber = n_subscriber
+            self.thumbnail = thumbnail
+            self.affiliations = affiliations
         else:
             raise ValueError(f"{url} is not a valid YouTube channel URL.")
 
