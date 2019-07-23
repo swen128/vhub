@@ -39,7 +39,7 @@ functions:
     handler: vhub.fetch_vtuber_antenna.lambda_handler
     events:
       - schedule:
-          rate: rate(5 minutes)
+          rate: rate(1 minutes)
           enabled: ${self:custom.schedule_enabled.${self:provider.stage}}
     timeout: 10
     iamRoleStatements:
