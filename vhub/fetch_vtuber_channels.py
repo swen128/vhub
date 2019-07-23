@@ -75,9 +75,9 @@ def save_channel(table: dynamodb.Table, channel: YoutubeChannel):
                 'affiliations': {'Value': channel.affiliations, 'Action': 'PUT'}
             }
         )
-        logger.info('Successfully saved a YouTube channel: %s', channel)
+        logger.info('Successfully saved a YouTube channel: %s', channel.url)
     except ClientError as e:
-        logger.error('Failed to save a YouTube channel: %s', channel)
+        logger.error('Failed to save a YouTube channel: %s', channel.url)
         logger.exception('The reason being: %s', e)
 
 
