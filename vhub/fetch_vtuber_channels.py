@@ -66,10 +66,15 @@ def parse_vtubers_list(html: str) -> Iterable[YoutubeChannel]:
 
 
 def save_channel(table: dynamodb.Table, channel: YoutubeChannel):
-    item = emptystr_to_none(vars(channel))
-
     try:
-        table.put_item(Item=item)
+        table.update_item(
+            Key={'url': channel.url},
+            AttributeUpdates={
+                'name': {'Value': channel.name, 'Action': 'PUT'},
+                'thumbnail': {'Value': channel.thumbnail, 'Action': 'PUT'},
+                'affiliations': {'Value': channel.affiliations, 'Action': 'PUT'}
+            }
+        )
         logger.info('Successfully saved a YouTube channel: %s', channel)
     except ClientError as e:
         logger.error('Failed to save a YouTube channel: %s', channel)
