@@ -21,13 +21,18 @@ def vtuber_channel_detail(url: str, table: dynamodb.Table) -> Optional[YoutubeCh
     if dic is None:
         return None
     else:
-        return YoutubeChannel(url=dic['url'], name=dic['name'])
+        return YoutubeChannel(
+            url=dic['url'],
+            name=dic['name'],
+            is_host_blacklisted=dic.get('is_host_blacklisted'),
+            is_guest_blacklisted=dic.get('is_guest_blacklisted')
+        )
 
 
 def mentioned_vtuber_channels(video: YoutubeVideo, table: dynamodb.Table) -> Iterable[YoutubeChannel]:
     channels = mentioned_channel_urls(video)
     details = (vtuber_channel_detail(channel, table) for channel in channels)
-    vtuber_channels = (x for x in details if x is not None)
+    vtuber_channels = (x for x in details if x is not None and not x.is_guest_blacklisted)
 
     return vtuber_channels
 
@@ -90,6 +95,8 @@ def main(event, table: dynamodb.Table) -> Tuple[YoutubeVideo, Set[str]]:
 
     if host_channel is None:
         channels = mentioned_channels
+    elif host_channel.is_host_blacklisted:
+        channels = []
     else:
         channels = [host_channel] + mentioned_channels
 
