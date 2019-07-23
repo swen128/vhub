@@ -48,6 +48,16 @@ def table():
             "url": "https://www.youtube.com/channel/MQKCcKfz5P4xhcpboXJK65"
         })
         table.put_item(Item={
+            "name": "test_channel_host_blacklisted",
+            "is_host_blacklisted": True,
+            "url": "https://www.youtube.com/channel/GxFTPcP3jQvfmkDgkaeeeP"
+        }),
+        table.put_item(Item={
+            "name": "test_channel_guest_blacklisted",
+            "is_guest_blacklisted": True,
+            "url": "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+        })
+        table.put_item(Item={
             "created_at": "2018-10-21T10:52:42Z",
             "n_followers": 105,
             "n_followings": 175,
@@ -107,3 +117,21 @@ def test_duplicate_channel_names(table):
     assert video.url == "https://www.youtube.com/watch?v=test_video"
     assert video.title == "test_title"
     assert channel_names == {"test_channel_with_dupe_name"}
+
+
+def test_host_blacklisted(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/host_blacklisted.json")
+    video, channel_names = main(event, table)
+
+    assert video.url == "https://www.youtube.com/watch?v=test_video"
+    assert video.title == "test_title"
+    assert channel_names == set()
+
+
+def test_guest_blacklisted(table):
+    event = read_json("tests/aws_event/dynamodb/Videos/guest_blacklisted.json")
+    video, channel_names = main(event, table)
+
+    assert video.url == "https://www.youtube.com/watch?v=test_video"
+    assert video.title == "test_title"
+    assert channel_names == {"test_channel_0"}

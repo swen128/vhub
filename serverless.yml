@@ -39,7 +39,7 @@ functions:
     handler: vhub.fetch_vtuber_antenna.lambda_handler
     events:
       - schedule:
-          rate: rate(5 minutes)
+          rate: rate(1 minutes)
           enabled: ${self:custom.schedule_enabled.${self:provider.stage}}
     timeout: 10
     iamRoleStatements:
@@ -90,6 +90,22 @@ functions:
           - Fn::GetAtt:
             - ChannelsTable
             - Arn
+  fetch_vtuber_channels:
+    handler: vhub.fetch_vtuber_channels.lambda_handler
+    events:
+      - schedule:
+          rate: cron(0 3 * * ? *)
+          enabled: ${self:custom.schedule_enabled.${self:provider.stage}}
+    timeout: 900
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+        Resource:
+          - Fn::GetAtt:
+              - ChannelsTable
+              - Arn
 
 resources:
   Resources:
@@ -120,4 +136,4 @@ resources:
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          WriteCapacityUnits: 5
