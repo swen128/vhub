@@ -7,6 +7,7 @@ import tweepy
 from boto3.dynamodb.types import TypeDeserializer
 from boto3_type_annotations import dynamodb
 from toolz import valmap
+from twitter_text import parse_tweet
 
 from .youtube import YoutubeVideo, YoutubeChannel, short_youtube_video_url, mentioned_channel_urls
 
@@ -44,7 +45,11 @@ def video_from_event(event) -> YoutubeVideo:
     return YoutubeVideo(**dic)
 
 
-def message(video: YoutubeVideo, channel_names: Iterable[str]) -> Iterable[str]:
+def is_valid_tweet(text: str) -> bool:
+    return parse_tweet(text).valid
+
+
+def message(video: YoutubeVideo, channel_names: Iterable[str]) -> str:
     url = short_youtube_video_url(video.url)
     channel_names_lines = '\n'.join(channel_names)
 
@@ -52,43 +57,12 @@ def message(video: YoutubeVideo, channel_names: Iterable[str]) -> Iterable[str]:
     mes_mid = f"#VTuberコラボ通知\n{video.title}\n{url}"
     mes_long = f"{mes_short}\n\n【参加者】\n{channel_names_lines}"
     mes_max = f"{mes_mid}\n\n【参加者】\n{channel_names_lines}"
+    messages = [mes_max, mes_long, mes_mid, mes_short]
 
-    return [mes_max, mes_long, mes_mid, mes_short]
-
-
-def tweet_(message: str, twitter: tweepy.API):
-    """
-    Try to tweet a single `message` and log the result.
-    Raises a `ValueError` iff `message` is too long to tweet.
-    """
-    try:
-        twitter.update_status(message)
-        logger.info('Tweeted: %s', message)
-    except tweepy.TweepError as e:
-        if e.api_code == 186:
-            raise ValueError("The message is too long to tweet.")
-        else:
-            logger.error('Failed to tweet: %s', message)
-            logger.exception('The reason being: %s', e)
-    except Exception as e:
-        logger.error('Failed to tweet: %s', message)
-        logger.exception('The reason being: %s', e)
+    return next(filter(is_valid_tweet, messages))
 
 
-def tweet(messages: Iterable[str], twitter: tweepy.API):
-    """
-    Tweet the first message in `messages` having an appropriate length.
-    `messages` are assumed to be sorted by length in descending order.
-    """
-    for message in messages:
-        try:
-            tweet_(message, twitter)
-            return
-        except ValueError:
-            pass
-
-
-def main(event, table: dynamodb.Table) -> Tuple[YoutubeVideo, Set[str]]:
+def main(event, table: dynamodb.Table, twitter: tweepy.API):
     video = video_from_event(event)
     host_channel = vtuber_channel_detail(video.channel_url, table)
     mentioned_channels = list(mentioned_vtuber_channels(video, table))
@@ -102,7 +76,9 @@ def main(event, table: dynamodb.Table) -> Tuple[YoutubeVideo, Set[str]]:
 
     channel_names = set(channel.name for channel in channels)
 
-    return video, channel_names
+    if len(channel_names) >= 2:
+        mes = message(video, channel_names)
+        twitter.update_status(mes)
 
 
 def lambda_handler_prod(event, context):
@@ -118,21 +94,25 @@ def lambda_handler_prod(event, context):
         table_name = os.environ["CHANNELS_TABLE"]
         table = boto3.resource('dynamodb').Table(table_name)
 
-        video, channels = main(event, table)
-
-        if len(channels) >= 2:
-            messages = message(video, channels)
-            tweet(messages, twitter)
+        main(event, table, twitter)
     except Exception as e:
         logger.error('An unexpected error happened.')
         logger.exception(e)
 
 
 def lambda_handler_dev(event, context):
-    table_name = os.environ["CHANNELS_TABLE"]
-    table = boto3.resource('dynamodb').Table(table_name)
+    class MockTwitter:
+        @staticmethod
+        def update_status(message: str):
+            logger.info(message)
 
-    video, channels = main(event, table)
-    messages = message(video, channels)
+    try:
+        twitter = MockTwitter()
 
-    logger.info(messages[0])
+        table_name = os.environ["CHANNELS_TABLE"]
+        table = boto3.resource('dynamodb').Table(table_name)
+
+        main(event, table, twitter)
+    except Exception as e:
+        logger.error('An unexpected error happened.')
+        logger.exception(e)

@@ -1,0 +1,256 @@
+- description: "There is no YouTube channel URL in the description."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: "description"
+
+  channels:
+    - name: "test_channel"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+
+  expected: []
+
+
+- description: "The host channel is unknown."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: "The other guy's channel: https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  channels:
+    - name: "test_channel"
+      url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  expected: []
+
+
+- description: "The guest channel is unknown."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: "The other guy's channel: https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  channels:
+    - name: "test_channel"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+
+  expected: []
+
+
+- description: "The host channel is black-listed."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: "Check out: https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  channels:
+    - name: "test_channel_0"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+      is_host_blacklisted: true
+    - name: "test_channel_1"
+      url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  expected: []
+
+
+- description: "The guest channel is black-listed."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: "My team's official channel: https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  channels:
+    - name: "test_channel_with_dupe_name"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+    - name: "test_channel_with_dupe_name"
+      url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+      is_guest_blacklisted: true
+
+  expected: []
+
+
+- description: "Two distinct channels with the identical channel name."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: "My sub-channel: https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  channels:
+    - name: "test_channel_with_dupe_name"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+    - name: "test_channel_with_dupe_name"
+      url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  expected: []
+
+
+- description: "There is a valid VTuber channel URL in the description."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: "The other guy's channel: https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  channels:
+    - name: "test_channel_0"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+    - name: "test_channel_1"
+      url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  expected:
+    - url: "https://youtu.be/test_video"
+      title: "test_title"
+      channels:
+        - "test_channel_0"
+        - "test_channel_1"
+
+
+- description: "The video title is too long to display in a tweet message."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title super long title "
+            description:
+              S: "The other guy's channel: https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  channels:
+    - name: "test_channel_0"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+    - name: "test_channel_1"
+      url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+
+  expected:
+    - url: "https://youtu.be/test_video"
+      title: null
+      channels:
+        - "test_channel_0"
+        - "test_channel_1"
+
+
+- description: "The channel names are too long to display in a tweet message."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: >
+                Participants:
+                https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i
+                https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN
+                https://www.youtube.com/channel/MQKCcKfz5P4xhcpboXJK65
+
+  channels:
+    - name: "super long name super long name super long name super long name"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+    - name: "super long name super long name super long name super long name super long name"
+      url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+    - name: "super long name super long name super long name super long name super long name super long name"
+      url: "https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
+
+  expected:
+    - url: "https://youtu.be/test_video"
+      title: "test_title"
+      channels: []

@@ -1,137 +1,108 @@
+import re
+from dataclasses import dataclass
+from typing import Tuple, List, Optional, Iterable
+
 import boto3
 import pytest
 from moto import mock_dynamodb2
+from twitter_text import parse_tweet
 
 from vhub.notifier import main
-from vhub.utils import read_json
+from vhub.utils import read_yaml
 
 
-@pytest.fixture
-def table():
-    with mock_dynamodb2():
-        db = boto3.resource('dynamodb', region_name='us-east-2')
-        db.create_table(
-            TableName='Channels',
-            KeySchema=[
-                {
-                    'AttributeName': 'url',
-                    'KeyType': 'HASH'
-                }
-            ],
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'url',
-                    'AttributeType': 'S'
-                },
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            }
+class MockTwitter:
+    def __init__(self):
+        self.tweeted_messages = []
+
+    def update_status(self, text: str):
+        if parse_tweet(text).valid:
+            self.tweeted_messages.append(text)
+        else:
+            raise ValueError(f'The tweet text is invalid: {text}')
+
+
+@dataclass(frozen=True)
+class NotificationTweet:
+    url: str
+    title: Optional[str]
+    channels: Iterable[str]
+
+    def __eq__(self, other):
+        return \
+            self.url == other.url and \
+            self.title == other.title and \
+            set(self.channels) == set(other.channels)
+
+
+def parse_notification_tweet(text: str) -> NotificationTweet:
+    try:
+        parts = text.split('\n\n【参加者】\n')
+
+        if len(parts) == 1:
+            [video_info] = parts
+            channels = None
+        elif len(parts) == 2:
+            video_info, channels = parts
+        else:
+            raise AssertionError()
+
+        pattern = re.compile(
+            r'#VTuberコラボ通知\n'
+            r'(?:(?P<title>.+)\n)?'
+            r'(?P<url>https://youtu\.be/.+)'
         )
-        table = db.Table('Channels')
+        match = pattern.fullmatch(video_info)
 
-        table.put_item(Item={
-            "name": "test_channel_0",
-            "url": "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
-        })
-        table.put_item(Item={
-            "name": "test_channel_1",
-            "url": "https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
-        })
-        table.put_item(Item={
-            "name": "test_channel_with_dupe_name",
-            "url": "https://www.youtube.com/channel/SwW4CwHHWLQccd6Pu3nKha"
-        })
-        table.put_item(Item={
-            "name": "test_channel_with_dupe_name",
-            "url": "https://www.youtube.com/channel/MQKCcKfz5P4xhcpboXJK65"
-        })
-        table.put_item(Item={
-            "name": "test_channel_host_blacklisted",
-            "is_host_blacklisted": True,
-            "url": "https://www.youtube.com/channel/GxFTPcP3jQvfmkDgkaeeeP"
-        }),
-        table.put_item(Item={
-            "name": "test_channel_guest_blacklisted",
-            "is_guest_blacklisted": True,
-            "url": "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
-        })
-        table.put_item(Item={
-            "created_at": "2018-10-21T10:52:42Z",
-            "n_followers": 105,
-            "n_followings": 175,
-            "n_likes": 336,
-            "n_tweets": 567,
-            "name": "test_channel_with_rich_info",
-            "twitter_url": "https://twitter.com/test_twitter_url",
-            "url": "https://www.youtube.com/channel/UC-_HZgzcDWuPT39nQQyAJDa"
-        })
-
-        yield table
+        return NotificationTweet(
+            url=match.group('url'),
+            title=match.group('title'),
+            channels=[] if channels is None else channels.splitlines()
+        )
+    except:
+        raise AssertionError(f"Invalid tweet message: {text}")
 
 
-def test_found(table):
-    event = read_json("tests/aws_event/dynamodb/Videos/with_mention.json")
-    video, channel_names = main(event, table)
-
-    assert video.url == "https://www.youtube.com/watch?v=test_video"
-    assert video.title == "test_title"
-    assert channel_names == {"test_channel_0", "test_channel_1"}
+def get_table(test_cases: dict) -> Tuple[str, List[list]]:
+    header = ",".join(test_cases[0].keys())
+    values = [list(case.values()) for case in test_cases]
+    return header, values
 
 
-def test_host_not_found(table):
-    event = read_json("tests/aws_event/dynamodb/Videos/unknown_host.json")
-    video, channels = main(event, table)
-
-    assert len(channels) == 1
+test_cases = read_yaml('tests/cases/notifier.yml')
 
 
-def test_mention_not_found(table):
-    event = read_json("tests/aws_event/dynamodb/Videos/unknown_mention.json")
-    video, channels = main(event, table)
+@pytest.mark.parametrize(*get_table(test_cases))
+@mock_dynamodb2
+def test_notifier(description: str, event: List[dict], channels: List[dict], expected: List[dict]):
+    twitter = MockTwitter()
 
-    assert len(channels) == 1
+    db = boto3.resource('dynamodb', region_name='us-east-2')
+    db.create_table(
+        TableName='Channels',
+        KeySchema=[
+            {
+                'AttributeName': 'url',
+                'KeyType': 'HASH'
+            }
+        ],
+        AttributeDefinitions=[
+            {
+                'AttributeName': 'url',
+                'AttributeType': 'S'
+            },
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 1,
+            'WriteCapacityUnits': 1
+        }
+    )
+    table = db.Table('Channels')
 
+    for channel in channels:
+        table.put_item(Item=channel)
 
-def test_none_found(table):
-    event = read_json("tests/aws_event/dynamodb/Videos/unknown_host_no_mention.json")
-    video, channels = main(event, table)
+    main(event, table, twitter)
 
-    assert len(channels) == 0
-
-
-def test_rich_info(table):
-    event = read_json("tests/aws_event/dynamodb/Videos/with_mention_rich_info.json")
-    video, channel_names = main(event, table)
-
-    assert video.url == "https://www.youtube.com/watch?v=test_video"
-    assert video.title == "test_title"
-    assert channel_names == {"test_channel_0", "test_channel_with_rich_info"}
-
-
-def test_duplicate_channel_names(table):
-    event = read_json("tests/aws_event/dynamodb/Videos/dupe_channel_name.json")
-    video, channel_names = main(event, table)
-
-    assert video.url == "https://www.youtube.com/watch?v=test_video"
-    assert video.title == "test_title"
-    assert channel_names == {"test_channel_with_dupe_name"}
-
-
-def test_host_blacklisted(table):
-    event = read_json("tests/aws_event/dynamodb/Videos/host_blacklisted.json")
-    video, channel_names = main(event, table)
-
-    assert video.url == "https://www.youtube.com/watch?v=test_video"
-    assert video.title == "test_title"
-    assert channel_names == set()
-
-
-def test_guest_blacklisted(table):
-    event = read_json("tests/aws_event/dynamodb/Videos/guest_blacklisted.json")
-    video, channel_names = main(event, table)
-
-    assert video.url == "https://www.youtube.com/watch?v=test_video"
-    assert video.title == "test_title"
-    assert channel_names == {"test_channel_0"}
+    for message, truth in zip(twitter.tweeted_messages, expected):
+        assert parse_notification_tweet(message) == NotificationTweet(**truth)
