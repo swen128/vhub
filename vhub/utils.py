@@ -1,25 +1,8 @@
-import json
-import yaml
 from datetime import datetime, timezone
 from gzip import GzipFile
 from io import BytesIO
 
 from toolz.dicttoolz import valmap
-
-
-def read_file(path: str) -> str:
-    with open(path, 'r') as f:
-        return f.read()
-
-
-def read_json(path: str) -> dict:
-    with open(path, 'r') as f:
-        return json.load(f)
-
-
-def read_yaml(path: str) -> dict:
-    with open(path, 'r') as f:
-        return yaml.safe_load(f)
 
 
 def gzip_str(string: str, encoding='utf-8') -> bytes:

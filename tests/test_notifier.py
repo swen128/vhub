@@ -6,7 +6,7 @@ from moto import mock_dynamodb2
 from twitter_text import parse_tweet
 
 from vhub.notifier import main
-from vhub.utils import read_yaml
+from tests.utils import read_yaml
 
 
 class MockTwitter:
