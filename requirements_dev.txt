@@ -3,3 +3,4 @@ moto
 requests_mock
 pytest
 pytest-cov
+pyyaml
