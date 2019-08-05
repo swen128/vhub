@@ -181,11 +181,14 @@
       url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
 
   expected:
-    - url: "https://youtu.be/test_video"
-      title: "test_title"
-      channels:
-        - "test_channel_0"
-        - "test_channel_1"
+    - |-
+      #VTuberコラボ通知
+      test_title
+      https://youtu.be/test_video
+
+      【参加者】
+      test_channel_0
+      test_channel_1
 
 
 - description: "The video title is too long to display in a tweet message."
@@ -213,11 +216,13 @@
       url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
 
   expected:
-    - url: "https://youtu.be/test_video"
-      title: null
-      channels:
-        - "test_channel_0"
-        - "test_channel_1"
+    - |-
+      #VTuberコラボ通知
+      https://youtu.be/test_video
+
+      【参加者】
+      test_channel_0
+      test_channel_1
 
 
 - description: "The channel names are too long to display in a tweet message."
@@ -236,7 +241,7 @@
             title:
               S: "test_title"
             description:
-              S: >
+              S: |
                 Participants:
                 https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i
                 https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN
@@ -251,6 +256,52 @@
       url: "https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
 
   expected:
-    - url: "https://youtu.be/test_video"
-      title: "test_title"
-      channels: []
+    - |-
+      #VTuberコラボ通知
+      test_title
+      https://youtu.be/test_video
+
+
+- description: "The channel names should be properly sorted in the tweet message."
+
+  event:
+    Records:
+      - dynamodb:
+          Keys:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+          NewImage:
+            url:
+              S: "https://www.youtube.com/watch?v=test_video"
+            channel_url:
+              S: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+            title:
+              S: "test_title"
+            description:
+              S: |
+                Participants:
+                https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i
+                https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN
+                https://www.youtube.com/channel/MQKCcKfz5P4xhcpboXJK65
+
+  channels:
+    - name: "test_channel_3"
+      url: "https://www.youtube.com/channel/Av87muUsEdf7amViaQ4L84"
+    - name: "test_channel_1"
+      url: "https://www.youtube.com/channel/ZLe5IzkSGQaDtd6VqgDE3i"
+    - name: "test_channel_2"
+      url: "https://www.youtube.com/channel/LH8D-9UHBa8I_L2pZhZfTN"
+    - name: "test_channel_0"
+      url: "https://www.youtube.com/channel/MQKCcKfz5P4xhcpboXJK65"
+
+  expected:
+    - |-
+      #VTuberコラボ通知
+      test_title
+      https://youtu.be/test_video
+
+      【参加者】
+      test_channel_0
+      test_channel_1
+      test_channel_2
+      test_channel_3

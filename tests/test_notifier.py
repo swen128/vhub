@@ -1,6 +1,4 @@
-import re
-from dataclasses import dataclass
-from typing import Tuple, List, Optional, Iterable
+from typing import Tuple, List
 
 import boto3
 import pytest
@@ -20,47 +18,6 @@ class MockTwitter:
             self.tweeted_messages.append(text)
         else:
             raise ValueError(f'The tweet text is invalid: {text}')
-
-
-@dataclass(frozen=True)
-class NotificationTweet:
-    url: str
-    title: Optional[str]
-    channels: Iterable[str]
-
-    def __eq__(self, other):
-        return \
-            self.url == other.url and \
-            self.title == other.title and \
-            set(self.channels) == set(other.channels)
-
-
-def parse_notification_tweet(text: str) -> NotificationTweet:
-    try:
-        parts = text.split('\n\n【参加者】\n')
-
-        if len(parts) == 1:
-            [video_info] = parts
-            channels = None
-        elif len(parts) == 2:
-            video_info, channels = parts
-        else:
-            raise AssertionError()
-
-        pattern = re.compile(
-            r'#VTuberコラボ通知\n'
-            r'(?:(?P<title>.+)\n)?'
-            r'(?P<url>https://youtu\.be/.+)'
-        )
-        match = pattern.fullmatch(video_info)
-
-        return NotificationTweet(
-            url=match.group('url'),
-            title=match.group('title'),
-            channels=[] if channels is None else channels.splitlines()
-        )
-    except:
-        raise AssertionError(f"Invalid tweet message: {text}")
 
 
 def get_table(test_cases: dict) -> Tuple[str, List[list]]:
@@ -104,5 +61,4 @@ def test_notifier(description: str, event: List[dict], channels: List[dict], exp
 
     main(event, table, twitter)
 
-    for message, truth in zip(twitter.tweeted_messages, expected):
-        assert parse_notification_tweet(message) == NotificationTweet(**truth)
+    assert twitter.tweeted_messages == expected

@@ -51,7 +51,7 @@ def is_valid_tweet(text: str) -> bool:
 
 def message(video: YoutubeVideo, channel_names: Iterable[str]) -> str:
     url = short_youtube_video_url(video.url)
-    channel_names_lines = '\n'.join(channel_names)
+    channel_names_lines = '\n'.join(sorted(channel_names))
 
     mes_short = f"#VTuberコラボ通知\n{url}"
     mes_mid = f"#VTuberコラボ通知\n{video.title}\n{url}"
