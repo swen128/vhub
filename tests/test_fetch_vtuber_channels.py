@@ -5,8 +5,8 @@ import requests_mock
 from moto import mock_dynamodb2
 
 from vhub.fetch_vtuber_channels import parse_vtubers_list, main, save_channel
-from vhub.utils import read_file
 from vhub.youtube import YoutubeChannel
+from tests.utils import read_file
 
 
 def mock_request(url: str, text: str, headers: dict = {}, method: str = 'GET') -> requests.Response:
